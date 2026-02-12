@@ -1,0 +1,719 @@
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { useColregsStorage } from './hooks/useLocalStorage';
+import { PARTS } from './data/defaultRules';
+import { Rule, Note } from './types';
+
+// ============ UTILITY: Render bold markdown **text** ============
+function renderBold(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <span key={i} className="font-bold text-sky-200">{part.slice(2, -2)}</span>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
+function FormattedText({ text, className = '' }: { text: string; className?: string }) {
+  const lines = text.split('\n');
+  return (
+    <div className={className}>
+      {lines.map((line, i) => (
+        <p key={i} className={`${line.trim() === '' ? 'h-3' : 'leading-relaxed'}`}>
+          {renderBold(line)}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+// ============ ICONS ============
+function PlusIcon({ className = 'w-5 h-5' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+    </svg>
+  );
+}
+
+function PencilIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+    </svg>
+  );
+}
+
+function TrashIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+    </svg>
+  );
+}
+
+function ChevronIcon({ open, className = 'w-5 h-5' }: { open: boolean; className?: string }) {
+  return (
+    <svg className={`${className} transition-transform duration-200 ${open ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+    </svg>
+  );
+}
+
+function AnchorIcon({ className = 'w-6 h-6' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <circle cx="12" cy="5" r="2" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 7v14m0 0c-4 0-7-3-7-7h3m4 7c4 0 7-3 7-7h-3" />
+    </svg>
+  );
+}
+
+function SearchIcon({ className = 'w-5 h-5' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+    </svg>
+  );
+}
+
+function BookIcon({ className = 'w-5 h-5' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+    </svg>
+  );
+}
+
+function NoteIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 011.037-.443 48.282 48.282 0 005.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+    </svg>
+  );
+}
+
+// ============ MODAL ============
+function Modal({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
+
+  if (!open) return null;
+
+  return (
+    <div ref={overlayRef} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}>
+      <div className="bg-slate-800 border border-slate-600 rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col animate-in">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
+          <h3 className="text-lg font-semibold text-white">{title}</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors text-2xl leading-none">&times;</button>
+        </div>
+        <div className="px-6 py-4 overflow-y-auto flex-1">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============ RULE CARD ============
+function RuleCard({ rule, onEdit, onDelete, onAddNote, onEditNote, onDeleteNote }: {
+  rule: Rule;
+  onEdit: (rule: Rule) => void;
+  onDelete: (id: string) => void;
+  onAddNote: (ruleId: string) => void;
+  onEditNote: (ruleId: string, note: Note) => void;
+  onDeleteNote: (ruleId: string, noteId: string) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+
+  return (
+    <div id={`rule-${rule.number}`} className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+      {/* Header */}
+      <div className="flex items-start gap-3 px-5 py-4 cursor-pointer" onClick={() => setExpanded(!expanded)}>
+        <div className="flex-shrink-0 mt-0.5">
+          <ChevronIcon open={expanded} className="w-5 h-5 text-slate-400" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-sky-600/20 text-sky-400 font-bold text-sm border border-sky-500/30">
+              R{rule.number}
+            </span>
+            <div>
+              <h3 className="text-lg font-semibold text-white">Rule {rule.number} – {rule.title}</h3>
+              {rule.isCustom && <span className="inline-block text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30 mt-1">Custom</span>}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {rule.notes.length > 0 && (
+            <span className="inline-flex items-center gap-1 text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
+              <NoteIcon className="w-3 h-3" />
+              {rule.notes.length}
+            </span>
+          )}
+          <button onClick={(e) => { e.stopPropagation(); onEdit(rule); }} className="p-2 text-slate-400 hover:text-sky-400 hover:bg-sky-500/10 rounded-lg transition-colors" title="Edit Rule">
+            <PencilIcon />
+          </button>
+          <button onClick={(e) => { e.stopPropagation(); if (confirm(`Delete Rule ${rule.number} – ${rule.title}?`)) onDelete(rule.id); }} className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors" title="Delete Rule">
+            <TrashIcon />
+          </button>
+        </div>
+      </div>
+
+      {/* Expanded content */}
+      {expanded && (
+        <div className="px-5 pb-5 space-y-4 border-t border-slate-700/50 pt-4">
+          <FormattedText text={rule.content} className="text-slate-300 text-sm" />
+
+          {/* Sub-sections */}
+          {rule.subSections.map(sub => (
+            <div key={sub.id} className="bg-slate-900/50 border border-slate-700/30 rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-sky-300 mb-2">{sub.label}</h4>
+              <FormattedText text={sub.content} className="text-slate-300 text-sm" />
+            </div>
+          ))}
+
+          {/* Notes section */}
+          <div className="border-t border-slate-700/30 pt-3">
+            <div className="flex items-center justify-between mb-2">
+              <button onClick={() => setShowNotes(!showNotes)} className="flex items-center gap-2 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
+                <NoteIcon />
+                Study Notes ({rule.notes.length})
+                <ChevronIcon open={showNotes} className="w-4 h-4" />
+              </button>
+              <button onClick={() => onAddNote(rule.id)} className="flex items-center gap-1 text-xs text-sky-400 hover:text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 px-3 py-1.5 rounded-lg transition-colors border border-sky-500/20">
+                <PlusIcon className="w-3 h-3" />
+                Add Note
+              </button>
+            </div>
+            {showNotes && rule.notes.length > 0 && (
+              <div className="space-y-2 mt-3">
+                {rule.notes.map(note => (
+                  <div key={note.id} className="bg-emerald-900/20 border border-emerald-700/30 rounded-lg p-3 group">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm text-slate-300 flex-1 whitespace-pre-wrap">{note.text}</p>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                        <button onClick={() => onEditNote(rule.id, note)} className="p-1 text-slate-400 hover:text-sky-400 rounded transition-colors">
+                          <PencilIcon className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => { if (confirm('Delete this note?')) onDeleteNote(rule.id, note.id); }} className="p-1 text-slate-400 hover:text-red-400 rounded transition-colors">
+                          <TrashIcon className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-2">{new Date(note.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+            {showNotes && rule.notes.length === 0 && (
+              <p className="text-xs text-slate-500 italic mt-2">No notes yet. Click "Add Note" to create one.</p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============ SUMMARY CARD ============
+function SummarySection() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="bg-gradient-to-br from-indigo-900/30 to-slate-900/50 border border-indigo-700/30 rounded-xl overflow-hidden">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-3 px-5 py-4 text-left">
+        <ChevronIcon open={open} className="w-5 h-5 text-indigo-400" />
+        <BookIcon className="w-5 h-5 text-indigo-400" />
+        <h3 className="text-lg font-semibold text-white">Summary & Quick Reference</h3>
+      </button>
+      {open && (
+        <div className="px-5 pb-5 space-y-4 border-t border-indigo-700/30 pt-4">
+          <div className="space-y-3">
+            <h4 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">Part A – General (Rules 1–3)</h4>
+            <ul className="space-y-2 text-sm text-slate-300">
+              <li><span className="font-semibold text-sky-300">RULE 1</span> – Application: COLREGS apply to all vessels on the high seas and connected waters navigable by seagoing vessels.</li>
+              <li><span className="font-semibold text-sky-300">RULE 2</span> – Responsibility: No one is exonerated from complying. Departure from rules permitted only to avoid immediate danger.</li>
+              <li><span className="font-semibold text-sky-300">RULE 3</span> – General Definitions: Defines vessel, power-driven vessel, sailing vessel, NUC, RAM, constrained by draught, etc.</li>
+            </ul>
+          </div>
+          <div className="space-y-3">
+            <h4 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">Part B Section I – Any Condition of Visibility (Rules 4–10)</h4>
+            <ul className="space-y-2 text-sm text-slate-300">
+              <li><span className="font-semibold text-sky-300">RULE 4</span> – Applies in any condition of visibility.</li>
+              <li><span className="font-semibold text-sky-300">RULE 5</span> – Proper look-out at all times by sight, hearing, and all available means.</li>
+              <li><span className="font-semibold text-sky-300">RULE 6</span> – Safe speed considering visibility, traffic, manoeuvrability, and radar.</li>
+              <li><span className="font-semibold text-sky-300">RULE 7</span> – Use all available means to determine risk of collision. If in doubt, risk exists.</li>
+              <li><span className="font-semibold text-sky-300">RULE 8</span> – Action must be positive, in ample time, and large enough to be apparent.</li>
+              <li><span className="font-semibold text-sky-300">RULE 9</span> – Keep to starboard in narrow channels.</li>
+              <li><span className="font-semibold text-sky-300">RULE 10</span> – Follow TSS traffic lanes, cross at right angles.</li>
+            </ul>
+          </div>
+          <div className="space-y-3">
+            <h4 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">Part B Section II – Vessels in Sight of One Another (Rules 11–18)</h4>
+            <ul className="space-y-2 text-sm text-slate-300">
+              <li><span className="font-semibold text-sky-300">RULE 11</span> – Applies to vessels in sight of one another.</li>
+              <li><span className="font-semibold text-sky-300">RULE 12</span> – Sailing vessel rules: port tack gives way, windward gives way.</li>
+              <li><span className="font-semibold text-sky-300">RULE 13</span> – Overtaking: overtaking vessel keeps clear (&gt;22.5° abaft beam).</li>
+              <li><span className="font-semibold text-sky-300">RULE 14</span> – Head on: both alter to starboard, pass port to port.</li>
+              <li><span className="font-semibold text-sky-300">RULE 15</span> – Crossing: vessel with other on starboard gives way.</li>
+              <li><span className="font-semibold text-sky-300">RULE 16</span> – Give way vessel: take early and substantial action.</li>
+              <li><span className="font-semibold text-sky-300">RULE 17</span> – Stand on vessel: maintain course/speed, may act if give way fails.</li>
+              <li><span className="font-semibold text-sky-300">RULE 18</span> – Hierarchy: NUC &gt; RAM &gt; Fishing &gt; Sailing &gt; Power-driven &gt; Seaplane/WIG.</li>
+            </ul>
+          </div>
+          <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/30">
+            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Reference</h4>
+            <p className="text-xs text-slate-500">Convention on the International Regulations for Preventing Collisions at Sea, 1972 (COLREGs)</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============ HIERARCHY VISUAL ============
+function HierarchyDiagram() {
+  const [open, setOpen] = useState(false);
+  const levels = [
+    { label: 'NUC', full: 'Vessel Not Under Command', color: 'bg-red-500/20 border-red-500/40 text-red-300' },
+    { label: 'RAM', full: 'Restricted in Ability to Manoeuvre', color: 'bg-orange-500/20 border-orange-500/40 text-orange-300' },
+    { label: 'Fishing', full: 'Vessel Engaged in Fishing', color: 'bg-amber-500/20 border-amber-500/40 text-amber-300' },
+    { label: 'Sailing', full: 'Sailing Vessel', color: 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' },
+    { label: 'Power', full: 'Power-Driven Vessel', color: 'bg-sky-500/20 border-sky-500/40 text-sky-300' },
+    { label: 'Seaplane/WIG', full: 'Seaplane & WIG Craft', color: 'bg-violet-500/20 border-violet-500/40 text-violet-300' },
+  ];
+
+  return (
+    <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 border border-slate-700/50 rounded-xl overflow-hidden">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-3 px-5 py-4 text-left">
+        <ChevronIcon open={open} className="w-5 h-5 text-amber-400" />
+        <span className="text-lg">⚓</span>
+        <h3 className="text-lg font-semibold text-white">Rule 18 – Give Way Hierarchy</h3>
+      </button>
+      {open && (
+        <div className="px-5 pb-5 border-t border-slate-700/30 pt-4">
+          <p className="text-xs text-slate-400 mb-4 text-center">← Highest Priority | Lowest Priority →</p>
+          <div className="space-y-2">
+            {levels.map((level, i) => (
+              <div key={level.label} className="flex items-center gap-3">
+                <span className="text-xs text-slate-500 w-4 text-right font-mono">{i + 1}</span>
+                <div className={`flex-1 flex items-center gap-2 px-4 py-2.5 rounded-lg border ${level.color}`} style={{ marginLeft: `${i * 16}px` }}>
+                  <span className="font-bold text-sm">{level.label}</span>
+                  <span className="text-xs opacity-70">– {level.full}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-slate-500 mt-3 text-center italic">Each level gives way to all levels above it</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============ MAIN APP ============
+export function App() {
+  const { rules, addRule, updateRule, deleteRule, addNote, updateNote, deleteNote, resetToDefaults } = useColregsStorage();
+  const [activePartKey, setActivePartKey] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showRuleModal, setShowRuleModal] = useState(false);
+  const [showNoteModal, setShowNoteModal] = useState(false);
+  const [editingRule, setEditingRule] = useState<Rule | null>(null);
+  const [editingNote, setEditingNote] = useState<{ ruleId: string; note: Note } | null>(null);
+  const [noteRuleId, setNoteRuleId] = useState<string>('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Form state for rule
+  const [formRuleNumber, setFormRuleNumber] = useState('');
+  const [formRuleTitle, setFormRuleTitle] = useState('');
+  const [formRuleContent, setFormRuleContent] = useState('');
+  const [formRulePartKey, setFormRulePartKey] = useState('part-a');
+
+  // Form state for note
+  const [formNoteText, setFormNoteText] = useState('');
+
+  // Filter rules
+  const filteredRules = useMemo(() => {
+    let filtered = rules;
+    if (activePartKey) {
+      filtered = filtered.filter(r => r.partKey === activePartKey);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(r =>
+        r.title.toLowerCase().includes(q) ||
+        r.content.toLowerCase().includes(q) ||
+        `rule ${r.number}`.includes(q) ||
+        r.subSections.some(s => s.content.toLowerCase().includes(q) || s.label.toLowerCase().includes(q)) ||
+        r.notes.some(n => n.text.toLowerCase().includes(q))
+      );
+    }
+    return filtered;
+  }, [rules, activePartKey, searchQuery]);
+
+  // Group filtered rules by part
+  const groupedRules = useMemo(() => {
+    const groups: { part: typeof PARTS[0]; rules: Rule[] }[] = [];
+    for (const part of PARTS) {
+      const partRules = filteredRules.filter(r => r.partKey === part.key);
+      if (partRules.length > 0) {
+        groups.push({ part, rules: partRules });
+      }
+    }
+    // Custom parts that don't match existing
+    const customRules = filteredRules.filter(r => !PARTS.some(p => p.key === r.partKey));
+    if (customRules.length > 0) {
+      groups.push({ part: { key: 'custom', title: 'Custom Rules', ruleRange: '' }, rules: customRules });
+    }
+    return groups;
+  }, [filteredRules]);
+
+  // Open add rule modal
+  function handleOpenAddRule() {
+    setEditingRule(null);
+    setFormRuleNumber('');
+    setFormRuleTitle('');
+    setFormRuleContent('');
+    setFormRulePartKey(activePartKey || 'part-a');
+    setShowRuleModal(true);
+  }
+
+  // Open edit rule modal
+  function handleOpenEditRule(rule: Rule) {
+    setEditingRule(rule);
+    setFormRuleNumber(String(rule.number));
+    setFormRuleTitle(rule.title);
+    setFormRuleContent(rule.content);
+    setFormRulePartKey(rule.partKey);
+    setShowRuleModal(true);
+  }
+
+  // Save rule
+  function handleSaveRule() {
+    const num = parseInt(formRuleNumber);
+    if (!num || !formRuleTitle.trim()) return;
+    if (editingRule) {
+      updateRule(editingRule.id, { number: num, title: formRuleTitle.trim(), content: formRuleContent.trim(), partKey: formRulePartKey });
+    } else {
+      addRule({ number: num, title: formRuleTitle.trim(), content: formRuleContent.trim(), partKey: formRulePartKey });
+    }
+    setShowRuleModal(false);
+  }
+
+  // Open add note modal
+  function handleOpenAddNote(ruleId: string) {
+    setNoteRuleId(ruleId);
+    setEditingNote(null);
+    setFormNoteText('');
+    setShowNoteModal(true);
+  }
+
+  // Open edit note modal
+  function handleOpenEditNote(ruleId: string, note: Note) {
+    setNoteRuleId(ruleId);
+    setEditingNote({ ruleId, note });
+    setFormNoteText(note.text);
+    setShowNoteModal(true);
+  }
+
+  // Save note
+  function handleSaveNote() {
+    if (!formNoteText.trim()) return;
+    if (editingNote) {
+      updateNote(editingNote.ruleId, editingNote.note.id, formNoteText.trim());
+    } else {
+      addNote(noteRuleId, formNoteText.trim());
+    }
+    setShowNoteModal(false);
+  }
+
+  const totalNotes = rules.reduce((sum, r) => sum + r.notes.length, 0);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-700/50 shadow-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-3">
+              <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+              </button>
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+                  <AnchorIcon className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-lg font-bold text-white leading-tight">COLREGS</h1>
+                  <p className="text-[10px] text-slate-400 leading-tight hidden sm:block">International Regulations for Preventing Collisions at Sea, 1972</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-3 text-xs text-slate-400">
+                <span>{rules.length} rules</span>
+                <span>•</span>
+                <span>{totalNotes} notes</span>
+              </div>
+              <button onClick={handleOpenAddRule} className="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors shadow-lg shadow-sky-600/20">
+                <PlusIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">Add Rule</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto flex">
+        {/* Sidebar */}
+        <aside className={`fixed inset-y-0 left-0 z-30 w-72 bg-slate-900/98 backdrop-blur-md border-r border-slate-700/50 transform transition-transform duration-300 lg:relative lg:transform-none lg:w-64 lg:flex-shrink-0 pt-16 lg:pt-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+          {sidebarOpen && <div className="fixed inset-0 bg-black/50 lg:hidden z-[-1]" onClick={() => setSidebarOpen(false)} />}
+          <div className="p-4 space-y-4 overflow-y-auto h-full">
+            {/* Search */}
+            <div className="relative">
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search rules & notes..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-9 pr-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all"
+              />
+            </div>
+
+            {/* Navigation */}
+            <nav className="space-y-1">
+              <button
+                onClick={() => { setActivePartKey(null); setSidebarOpen(false); }}
+                className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${!activePartKey ? 'bg-sky-600/20 text-sky-300 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+              >
+                📋 All Rules ({rules.length})
+              </button>
+              {PARTS.map(part => {
+                const count = rules.filter(r => r.partKey === part.key).length;
+                return (
+                  <button
+                    key={part.key}
+                    onClick={() => { setActivePartKey(part.key); setSidebarOpen(false); }}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors ${activePartKey === part.key ? 'bg-sky-600/20 text-sky-300 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+                  >
+                    <div className="font-medium">{part.key === 'part-a' ? '⚙️' : part.key === 'part-b-i' ? '🧭' : '👁️'} {part.ruleRange}</div>
+                    <div className="text-xs opacity-70 mt-0.5">{part.subtitle || part.title} ({count})</div>
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Quick Jump */}
+            <div className="border-t border-slate-700/50 pt-3">
+              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">Quick Jump</h4>
+              <div className="flex flex-wrap gap-1.5 px-2">
+                {rules.map(r => (
+                  <a
+                    key={r.id}
+                    href={`#rule-${r.number}`}
+                    onClick={() => setSidebarOpen(false)}
+                    className="inline-flex items-center justify-center w-8 h-8 text-xs font-medium rounded-lg bg-slate-800 text-slate-400 hover:bg-sky-600/20 hover:text-sky-300 border border-slate-700/50 hover:border-sky-500/30 transition-colors"
+                  >
+                    {r.number}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="border-t border-slate-700/50 pt-3 space-y-2">
+              <button onClick={() => { if (confirm('Reset all rules and notes to defaults? This will remove all custom content.')) resetToDefaults(); }} className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" />
+                </svg>
+                Reset to Defaults
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 min-w-0 px-4 sm:px-6 py-6">
+          {/* Hero Banner */}
+          {!activePartKey && !searchQuery && (
+            <div className="mb-8 bg-gradient-to-r from-sky-900/40 via-indigo-900/30 to-slate-900/40 border border-sky-700/30 rounded-2xl p-6 sm:p-8">
+              <div className="max-w-3xl">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                  Collision Regulations Study Notes
+                </h2>
+                <p className="text-sm sm:text-base text-slate-300 mb-1">
+                  Bachelor of Science in Marine Transportation
+                </p>
+                <p className="text-xs text-slate-400 mb-4">
+                  Part A (Rules 1–3) | Part B Section I (Rules 4–10) | Part B Section II (Rules 11–18)
+                </p>
+                <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/30">
+                  <p className="text-xs text-slate-400">
+                    <span className="font-semibold text-sky-400">CO1:</span> Demonstrate thorough knowledge and understanding of the content, application and intent of the International Regulations for Preventing Collisions at Sea, 1972, as amended.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Search indicator */}
+          {searchQuery && (
+            <div className="mb-4 flex items-center gap-2 text-sm text-slate-400">
+              <SearchIcon className="w-4 h-4" />
+              <span>Showing {filteredRules.length} result{filteredRules.length !== 1 ? 's' : ''} for "<span className="text-sky-400">{searchQuery}</span>"</span>
+              <button onClick={() => setSearchQuery('')} className="text-xs text-sky-500 hover:text-sky-400 ml-2">Clear</button>
+            </div>
+          )}
+
+          {/* Rules */}
+          <div className="space-y-8">
+            {groupedRules.map(group => (
+              <section key={group.part.key}>
+                <div className="mb-4">
+                  <h2 className="text-xl font-bold text-white">{group.part.title}</h2>
+                  {group.part.subtitle && <p className="text-sm text-sky-400 mt-0.5">{group.part.subtitle}</p>}
+                  <p className="text-xs text-slate-500 mt-0.5">{group.part.ruleRange}</p>
+                </div>
+                <div className="space-y-3">
+                  {group.rules.map(rule => (
+                    <RuleCard
+                      key={rule.id}
+                      rule={rule}
+                      onEdit={handleOpenEditRule}
+                      onDelete={deleteRule}
+                      onAddNote={handleOpenAddNote}
+                      onEditNote={handleOpenEditNote}
+                      onDeleteNote={deleteNote}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+
+          {filteredRules.length === 0 && (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">🔍</div>
+              <h3 className="text-lg font-semibold text-slate-400 mb-2">No rules found</h3>
+              <p className="text-sm text-slate-500">Try adjusting your search or filter, or add a new rule.</p>
+            </div>
+          )}
+
+          {/* Special sections */}
+          {!searchQuery && (
+            <div className="mt-10 space-y-4">
+              <HierarchyDiagram />
+              <SummarySection />
+            </div>
+          )}
+
+          {/* Footer */}
+          <footer className="mt-12 pt-8 border-t border-slate-800 text-center">
+            <p className="text-xs text-slate-600">
+              Convention on the International Regulations for Preventing Collisions at Sea, 1972 (COLREGs)
+            </p>
+            <p className="text-xs text-slate-700 mt-1">Data stored locally in your browser</p>
+          </footer>
+        </main>
+      </div>
+
+      {/* Rule Modal */}
+      <Modal open={showRuleModal} onClose={() => setShowRuleModal(false)} title={editingRule ? 'Edit Rule' : 'Add New Rule'}>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-400 mb-1">Rule Number *</label>
+              <input
+                type="number"
+                value={formRuleNumber}
+                onChange={e => setFormRuleNumber(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500"
+                placeholder="e.g., 19"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-400 mb-1">Part *</label>
+              <select
+                value={formRulePartKey}
+                onChange={e => setFormRulePartKey(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500"
+              >
+                {PARTS.map(p => (
+                  <option key={p.key} value={p.key}>{p.ruleRange} – {p.subtitle || p.title}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-1">Title *</label>
+            <input
+              type="text"
+              value={formRuleTitle}
+              onChange={e => setFormRuleTitle(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500"
+              placeholder="e.g., Use of Radar"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-1">Content</label>
+            <textarea
+              value={formRuleContent}
+              onChange={e => setFormRuleContent(e.target.value)}
+              rows={6}
+              className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 resize-y"
+              placeholder="Enter rule content. Use **text** for bold formatting."
+            />
+            <p className="text-xs text-slate-500 mt-1">Use **bold text** for emphasis</p>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button onClick={() => setShowRuleModal(false)} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium py-2.5 rounded-lg transition-colors">
+              Cancel
+            </button>
+            <button onClick={handleSaveRule} disabled={!formRuleNumber || !formRuleTitle.trim()} className="flex-1 bg-sky-600 hover:bg-sky-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium py-2.5 rounded-lg transition-colors">
+              {editingRule ? 'Save Changes' : 'Add Rule'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Note Modal */}
+      <Modal open={showNoteModal} onClose={() => setShowNoteModal(false)} title={editingNote ? 'Edit Note' : 'Add Study Note'}>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-1">
+              Note for: {rules.find(r => r.id === noteRuleId)?.title ? `Rule ${rules.find(r => r.id === noteRuleId)?.number} – ${rules.find(r => r.id === noteRuleId)?.title}` : ''}
+            </label>
+            <textarea
+              value={formNoteText}
+              onChange={e => setFormNoteText(e.target.value)}
+              rows={5}
+              className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 resize-y"
+              placeholder="Enter your study note..."
+              autoFocus
+            />
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button onClick={() => setShowNoteModal(false)} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium py-2.5 rounded-lg transition-colors">
+              Cancel
+            </button>
+            <button onClick={handleSaveNote} disabled={!formNoteText.trim()} className="flex-1 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium py-2.5 rounded-lg transition-colors">
+              {editingNote ? 'Save Changes' : 'Add Note'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+}
