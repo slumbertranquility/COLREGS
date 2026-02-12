@@ -1,619 +1,842 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COLREGS – International Regulations for Preventing Collisions at Sea, 1972</title>
-<style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0e1a;color:#cbd5e1;min-height:100vh;line-height:1.6}
-  a{color:#0ea5e9;text-decoration:none}
-  a:hover{text-decoration:underline}
-  button{cursor:pointer;font-family:inherit}
-  input,textarea,select{font-family:inherit}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚓ COLREGS 1972 – Complete Marine Collision Regulations</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  /* Header */
-  .header{background:linear-gradient(90deg,#0c1929,#1a2744,#0f2035);border-bottom:2px solid #0369a1;position:sticky;top:0;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.5)}
-  .header-inner{max-width:72rem;margin:0 auto;padding:1rem;text-align:center}
-  .header h1{font-size:1.35rem;font-weight:700;color:#38bdf8;letter-spacing:.05em}
-  .header .sub{font-size:.7rem;color:#64748b;margin-top:.25rem}
-  .header .sub2{font-size:.68rem;color:#475569;margin-top:.15rem}
+    <style>
+        /* Custom Styles from index.css */
+        @keyframes animate-in {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-in { animation: animate-in 0.2s ease-out; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.5); }
+        
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+        
+        /* Selection */
+        ::selection { background-color: rgba(56, 189, 248, 0.3); color: white; }
 
-  /* Toolbar */
-  .toolbar{background:#0f172a;border-bottom:1px solid #1e293b;position:sticky;top:72px;z-index:40}
-  .toolbar-inner{max-width:72rem;margin:0 auto;padding:.6rem 1rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
-  .search-input{flex:1;min-width:180px;background:#1e293b;border:1px solid #334155;border-radius:.75rem;padding:.5rem .75rem;font-size:.8rem;color:#e2e8f0;outline:none;transition:border-color .2s}
-  .search-input::placeholder{color:#475569}
-  .search-input:focus{border-color:#0ea5e9}
-  .tab-btn{padding:.35rem .75rem;border-radius:9999px;font-size:.7rem;font-weight:500;border:1px solid #334155;background:transparent;color:#64748b;transition:all .2s}
-  .tab-btn:hover{border-color:#0ea5e9;color:#7dd3fc}
-  .tab-btn.active{background:#0369a1;border-color:#0284c7;color:#fff}
-  .btn-add{background:#0369a1;color:#fff;font-size:.7rem;font-weight:700;padding:.35rem .75rem;border-radius:.75rem;border:none;transition:background .2s}
-  .btn-add:hover{background:#0284c7}
-  .btn-reset{border:1px solid #334155;background:transparent;color:#475569;font-size:.7rem;padding:.35rem .75rem;border-radius:.75rem;transition:all .2s}
-  .btn-reset:hover{border-color:#0ea5e9;color:#7dd3fc}
-
-  /* Jump nav */
-  .jump-nav{background:rgba(15,23,42,.8);border-bottom:1px solid #1e293b;position:sticky;top:120px;z-index:30}
-  .jump-inner{max-width:72rem;margin:0 auto;padding:.4rem 1rem;display:flex;align-items:center;gap:.25rem;flex-wrap:wrap}
-  .jump-label{font-size:.68rem;color:#475569;margin-right:.5rem}
-  .jump-link{width:1.75rem;height:1.5rem;border-radius:.25rem;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:500;border:1px solid;transition:all .2s}
-  .jump-link:hover{background:#0369a1;color:#fff!important;border-color:#0284c7!important;text-decoration:none}
-  .jump-link.pa{border-color:rgba(99,102,241,.5);color:#818cf8}
-  .jump-link.pb1{border-color:rgba(6,182,212,.5);color:#22d3ee}
-  .jump-link.pb2{border-color:rgba(16,185,129,.5);color:#34d399}
-
-  /* Main */
-  .main{max-width:56rem;margin:0 auto;padding:1.5rem 1rem}
-
-  /* Part header */
-  .part-header{padding:.75rem 1.25rem;margin:1.25rem 0;border-radius:.75rem;text-align:center;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;border:1px solid}
-  .part-header.parta{border-color:rgba(99,102,241,.4);background:linear-gradient(90deg,rgba(99,102,241,.1),transparent);color:#a5b4fc}
-  .part-header.partb1{border-color:rgba(6,182,212,.4);background:linear-gradient(90deg,rgba(6,182,212,.1),transparent);color:#67e8f9}
-  .part-header.partb2{border-color:rgba(16,185,129,.4);background:linear-gradient(90deg,rgba(16,185,129,.1),transparent);color:#6ee7b7}
-
-  /* Rule card */
-  .rule-card{background:rgba(30,41,59,.8);border:1px solid rgba(51,65,85,.6);border-radius:.75rem;overflow:hidden;transition:all .2s;margin-bottom:.75rem}
-  .rule-card:hover{border-color:rgba(14,165,233,.3);box-shadow:0 4px 20px rgba(14,165,233,.05)}
-  .rule-header{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;cursor:pointer;user-select:none}
-  .rule-num{width:2.75rem;height:2.75rem;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.8rem;flex-shrink:0}
-  .rule-num.parta{background:linear-gradient(135deg,#4f46e5,#a855f7)}
-  .rule-num.partb1{background:linear-gradient(135deg,#0891b2,#2dd4bf)}
-  .rule-num.partb2{background:linear-gradient(135deg,#059669,#22c55e)}
-  .rule-info{flex:1;min-width:0}
-  .rule-title{font-size:.9rem;font-weight:600;color:#f1f5f9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .rule-part{font-size:.65rem;color:#475569;text-transform:uppercase;letter-spacing:.08em}
-  .rule-actions{display:flex;align-items:center;gap:.375rem;flex-shrink:0}
-  .note-badge{font-size:.65rem;background:rgba(16,185,129,.15);color:#34d399;padding:.15rem .5rem;border-radius:9999px;border:1px solid rgba(16,185,129,.25)}
-  .btn-icon{padding:.35rem;color:#475569;background:none;border:none;border-radius:.5rem;font-size:.8rem;transition:all .15s;line-height:1}
-  .btn-icon:hover{background:rgba(14,165,233,.1)}
-  .btn-icon.edit:hover{color:#fb923c}
-  .btn-icon.del:hover{color:#f87171}
-  .chevron{color:#475569;font-size:1.1rem;transition:transform .2s;line-height:1}
-  .chevron.open{transform:rotate(180deg)}
-
-  /* Rule body */
-  .rule-body{border-top:1px solid rgba(51,65,85,.5);padding:0 1.25rem 1.25rem}
-  .rule-body.hidden{display:none}
-
-  /* Rule content HTML styles */
-  .rule-content{margin-top:1rem;font-size:.85rem;line-height:1.7;color:#94a3b8}
-  .rule-content h3{color:#38bdf8;font-size:.95rem;margin:18px 0 8px;border-bottom:1px solid #334155;padding-bottom:4px;font-weight:600}
-  .rule-content h4{color:#a78bfa;font-size:.88rem;margin:14px 0 6px}
-  .rule-content p{margin:8px 0}
-  .rule-content ul{margin:6px 0 6px 20px;list-style:disc}
-  .rule-content ul li{margin:4px 0}
-  .rule-content .hl{color:#38bdf8;font-weight:700}
-  .rule-content .nb{background:rgba(56,189,248,.08);border-left:3px solid #38bdf8;padding:10px 14px;margin:10px 0;border-radius:0 10px 10px 0;font-size:.84rem;color:#94a3b8}
-  .rule-content .kp{background:rgba(250,204,21,.08);border-left:3px solid #facc15;padding:10px 14px;margin:10px 0;border-radius:0 10px 10px 0;font-size:.84rem;color:#94a3b8}
-  .rule-content table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.84rem}
-  .rule-content th{background:#1e293b;color:#38bdf8;padding:8px 12px;text-align:left;border:1px solid #334155}
-  .rule-content td{padding:8px 12px;border:1px solid #334155;color:#94a3b8}
-  .rule-content .hierarchy{display:flex;flex-direction:column;gap:6px;margin:14px 0}
-  .rule-content .hi{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:10px;font-size:.84rem;font-weight:600;color:#fff}
-  .rule-content .hr{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0}
-  .rule-content .hi1{background:linear-gradient(90deg,#dc2626,#b91c1c)}
-  .rule-content .hi2{background:linear-gradient(90deg,#ea580c,#c2410c);margin-left:20px}
-  .rule-content .hi3{background:linear-gradient(90deg,#ca8a04,#a16207);margin-left:40px}
-  .rule-content .hi4{background:linear-gradient(90deg,#16a34a,#15803d);margin-left:60px}
-  .rule-content .hi5{background:linear-gradient(90deg,#0284c7,#0369a1);margin-left:80px}
-  .rule-content .hi6{background:linear-gradient(90deg,#7c3aed,#6d28d9);margin-left:100px}
-
-  /* Notes */
-  .notes-section{margin-top:1.25rem;padding-top:1rem;border-top:1px solid rgba(51,65,85,.4)}
-  .notes-title{color:#34d399;font-size:.8rem;font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
-  .note-item{background:rgba(15,23,42,.6);border-radius:.5rem;padding:.75rem;margin-bottom:.5rem;display:flex;align-items:flex-start;gap:.75rem}
-  .note-item:hover .note-actions{opacity:1}
-  .note-text{flex:1;font-size:.8rem;color:#64748b;white-space:pre-wrap}
-  .note-time{font-size:.6rem;color:#334155;flex-shrink:0}
-  .note-actions{display:flex;gap:.25rem;flex-shrink:0;opacity:0;transition:opacity .15s}
-  .note-actions button{color:#475569;background:none;border:none;font-size:.7rem;padding:.25rem;border-radius:.25rem;cursor:pointer}
-  .note-actions button:hover{color:#38bdf8}
-  .note-actions button.del-note:hover{color:#f87171}
-  .add-note-row{display:flex;gap:.5rem;margin-top:.5rem}
-  .note-input{flex:1;background:rgba(15,23,42,.5);border:1px solid #334155;border-radius:.5rem;padding:.5rem .75rem;font-size:.8rem;color:#94a3b8;outline:none;resize:vertical}
-  .note-input::placeholder{color:#334155}
-  .note-input:focus{border-color:#0ea5e9}
-  .btn-note-add{background:#059669;color:#fff;font-size:.7rem;font-weight:600;padding:.5rem .75rem;border:none;border-radius:.5rem;transition:background .2s}
-  .btn-note-add:hover{background:#10b981}
-
-  /* Summary */
-  .summary-card{margin-top:2.5rem;background:rgba(30,41,59,.6);border:1px solid rgba(51,65,85,.5);border-radius:.75rem;overflow:hidden}
-  .summary-toggle{width:100%;display:flex;align-items:center;gap:.75rem;padding:1rem 1.25rem;background:none;border:none;text-align:left;cursor:pointer;user-select:none}
-  .summary-toggle h3{font-size:1.1rem;font-weight:600;color:#fbbf24}
-  .summary-body{padding:0 1.25rem 1.25rem;border-top:1px solid rgba(51,65,85,.4);padding-top:1rem}
-  .summary-body.hidden{display:none}
-  .summary-item{font-size:.8rem;color:#64748b;border-bottom:1px solid rgba(51,65,85,.3);padding-bottom:.5rem;margin-bottom:.5rem}
-  .summary-item:last-child{border-bottom:none}
-  .summary-item strong{color:#38bdf8}
-  .summary-footer{margin-top:1rem;font-size:.65rem;color:#334155}
-
-  /* Footer */
-  .footer{text-align:center;padding:2rem 1rem;font-size:.7rem;color:#334155;border-top:1px solid #1e293b;margin-top:2.5rem}
-  .footer p{margin:.25rem 0}
-
-  /* Empty state */
-  .empty{text-align:center;padding:4rem 1rem}
-  .empty .icon{font-size:2.5rem;margin-bottom:.75rem}
-  .empty p{color:#475569}
-
-  /* Toast */
-  .toast{position:fixed;bottom:1.25rem;right:1.25rem;z-index:999;background:#10b981;color:#fff;padding:.625rem 1.25rem;border-radius:.75rem;font-weight:600;font-size:.8rem;box-shadow:0 10px 30px rgba(0,0,0,.3);animation:slideUp .3s ease;pointer-events:none}
-  .toast.hidden{display:none}
-
-  /* Modal overlay */
-  .modal-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);padding:1rem}
-  .modal-overlay.hidden{display:none}
-  .modal{background:#1e293b;border:1px solid #475569;border-radius:1rem;box-shadow:0 20px 60px rgba(0,0,0,.5);width:100%;max-width:36rem;max-height:90vh;overflow-y:auto}
-  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid #334155}
-  .modal-header h3{font-size:1.05rem;font-weight:700;color:#38bdf8}
-  .modal-close{color:#64748b;background:none;border:none;font-size:1.5rem;line-height:1;transition:color .15s}
-  .modal-close:hover{color:#fff}
-  .modal-body{padding:1.5rem}
-  .modal-body label{display:block;font-size:.7rem;color:#64748b;margin-bottom:.25rem}
-  .modal-body input,.modal-body select,.modal-body textarea{width:100%;background:#0f172a;border:1px solid #475569;border-radius:.5rem;padding:.5rem .75rem;font-size:.8rem;color:#fff;outline:none;transition:border-color .2s}
-  .modal-body input:focus,.modal-body select:focus,.modal-body textarea:focus{border-color:#0ea5e9}
-  .modal-body textarea{resize:vertical;font-family:monospace}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
-  .form-group{margin-bottom:1rem}
-  .form-hint{font-size:.6rem;color:#334155;margin-top:.25rem}
-  .form-actions{display:flex;gap:.75rem;padding-top:.5rem}
-  .btn-cancel{flex:1;background:#334155;color:#fff;font-size:.8rem;font-weight:500;padding:.625rem;border:none;border-radius:.5rem;transition:background .2s}
-  .btn-cancel:hover{background:#475569}
-  .btn-save{flex:1;background:#0284c7;color:#fff;font-size:.8rem;font-weight:500;padding:.625rem;border:none;border-radius:.5rem;transition:background .2s}
-  .btn-save:hover{background:#0ea5e9}
-  .btn-save:disabled{opacity:.4;cursor:not-allowed}
-
-  @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-  @media(max-width:700px){
-    .rule-content .hi1,.rule-content .hi2,.rule-content .hi3,.rule-content .hi4,.rule-content .hi5,.rule-content .hi6{margin-left:0}
-    .jump-nav{display:none}
-    .header h1{font-size:1.1rem}
-    .toolbar{top:60px}
-  }
-  @media(max-width:500px){
-    .form-row{grid-template-columns:1fr}
-  }
-</style>
+        /* Dynamic HTML Content Styles */
+        .rule-content h3 { color: #38bdf8; font-size: .95rem; margin: 18px 0 8px; border-bottom: 1px solid #334155; padding-bottom: 4px; font-weight: 600; }
+        .rule-content p { margin: 8px 0; }
+        .rule-content ul { margin: 6px 0 6px 20px; list-style: disc; }
+        .rule-content ul li { margin: 4px 0; }
+        .rule-content .hl { color: #38bdf8; font-weight: 700; }
+        .rule-content .nb { background: rgba(56,189,248,.08); border-left: 3px solid #38bdf8; padding: 10px 14px; margin: 10px 0; border-radius: 0 10px 10px 0; font-size: .84rem; color: #94a3b8; }
+        .rule-content .kp { background: rgba(250,204,21,.08); border-left: 3px solid #facc15; padding: 10px 14px; margin: 10px 0; border-radius: 0 10px 10px 0; font-size: .84rem; color: #94a3b8; }
+        .rule-content table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: .84rem; }
+        .rule-content th { background: #1e293b; color: #38bdf8; padding: 8px 12px; text-align: left; border: 1px solid #334155; }
+        .rule-content td { padding: 8px 12px; border: 1px solid #334155; color: #94a3b8; }
+        
+        .rule-content .hierarchy { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; }
+        .rule-content .hi { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 10px; font-size: .84rem; font-weight: 600; color: #fff; }
+        .rule-content .hr { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; font-size: .75rem; flex-shrink: 0; }
+        .rule-content .hi1 { background: linear-gradient(90deg,#dc2626,#b91c1c); }
+        .rule-content .hi2 { background: linear-gradient(90deg,#ea580c,#c2410c); margin-left: 20px; }
+        .rule-content .hi3 { background: linear-gradient(90deg,#ca8a04,#a16207); margin-left: 40px; }
+        .rule-content .hi4 { background: linear-gradient(90deg,#16a34a,#15803d); margin-left: 60px; }
+        .rule-content .hi5 { background: linear-gradient(90deg,#0284c7,#0369a1); margin-left: 80px; }
+        .rule-content .hi6 { background: linear-gradient(90deg,#7c3aed,#6d28d9); margin-left: 100px; }
+        
+        @media(max-width:700px) { .rule-content .hi1,.rule-content .hi2,.rule-content .hi3,.rule-content .hi4,.rule-content .hi5,.rule-content .hi6 { margin-left: 0; } }
+    </style>
 </head>
-<body>
+<body class="bg-[#0a0e1a] text-slate-200">
+    <div id="root"></div>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="header-inner">
-    <h1>⚓ COLREGS – International Regulations for Preventing Collisions at Sea, 1972</h1>
-    <p class="sub">Bachelor of Science in Marine Transportation — Collision Regulations Study Notes</p>
-    <p class="sub2">Part A (Rules 1–3) | Part B Section I (Rules 4–10) | Part B Section II (Rules 11–18)</p>
-  </div>
-</header>
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <div class="toolbar-inner">
-    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search rules, definitions, notes...">
-    <button class="tab-btn active" data-filter="all">All Rules</button>
-    <button class="tab-btn" data-filter="parta">Part A</button>
-    <button class="tab-btn" data-filter="partb1">Part B-I</button>
-    <button class="tab-btn" data-filter="partb2">Part B-II</button>
-    <button class="btn-add" id="btnAdd">＋ Add Rule</button>
-    <button class="btn-reset" id="btnReset">↺ Reset</button>
-  </div>
-</div>
+        /* ================================================================
+           DATA DEFINITIONS
+           ================================================================ */
+        const PARTS = {
+            parta:   { label: "Part A – General (Rules 1–3)", color: "indigo", numGrad: "from-indigo-600 to-purple-500", borderCol: "border-indigo-500/40", bgCol: "bg-indigo-500/10", textCol: "text-indigo-300" },
+            partb1:  { label: "Part B – Section I: Any Condition of Visibility (Rules 4–10)", color: "cyan", numGrad: "from-cyan-600 to-teal-400", borderCol: "border-cyan-500/40", bgCol: "bg-cyan-500/10", textCol: "text-cyan-300" },
+            partb2:  { label: "Part B – Section II: Vessels in Sight of One Another (Rules 11–18)", color: "emerald", numGrad: "from-emerald-600 to-green-400", borderCol: "border-emerald-500/40", bgCol: "bg-emerald-500/10", textCol: "text-emerald-300" },
+            partb3:  { label: "Part B – Section III: Conduct in Restricted Visibility (Rule 19)", color: "violet", numGrad: "from-violet-600 to-purple-400", borderCol: "border-violet-500/40", bgCol: "bg-violet-500/10", textCol: "text-violet-300" },
+            partc:   { label: "Part C – Lights and Shapes (Rules 20–31)", color: "amber", numGrad: "from-amber-600 to-yellow-400", borderCol: "border-amber-500/40", bgCol: "bg-amber-500/10", textCol: "text-amber-300" },
+            partd:   { label: "Part D – Sound and Light Signals (Rules 32–37)", color: "rose", numGrad: "from-rose-600 to-pink-400", borderCol: "border-rose-500/40", bgCol: "bg-rose-500/10", textCol: "text-rose-300" },
+            parte:   { label: "Part E – Exemptions (Rule 38)", color: "sky", numGrad: "from-sky-600 to-blue-400", borderCol: "border-sky-500/40", bgCol: "bg-sky-500/10", textCol: "text-sky-300" },
+            partf:   { label: "Part F – Verification of Compliance (Rules 39–41)", color: "teal", numGrad: "from-teal-600 to-cyan-400", borderCol: "border-teal-500/40", bgCol: "bg-teal-500/10", textCol: "text-teal-300" },
+            annex1:  { label: "Annex I – Positioning and Technical Details of Lights and Shapes", color: "orange", numGrad: "from-orange-600 to-amber-400", borderCol: "border-orange-500/40", bgCol: "bg-orange-500/10", textCol: "text-orange-300" },
+            annex2:  { label: "Annex II – Additional Signals for Fishing Vessels", color: "lime", numGrad: "from-lime-600 to-green-400", borderCol: "border-lime-500/40", bgCol: "bg-lime-500/10", textCol: "text-lime-300" },
+            annex3:  { label: "Annex III – Technical Details of Sound Signal Appliances", color: "fuchsia", numGrad: "from-fuchsia-600 to-pink-400", borderCol: "border-fuchsia-500/40", bgCol: "bg-fuchsia-500/10", textCol: "text-fuchsia-300" },
+            annex4:  { label: "Annex IV – Distress Signals", color: "red", numGrad: "from-red-600 to-rose-400", borderCol: "border-red-500/40", bgCol: "bg-red-500/10", textCol: "text-red-300" },
+        };
 
-<!-- JUMP NAV -->
-<div class="jump-nav" id="jumpNav">
-  <div class="jump-inner">
-    <span class="jump-label">Jump to Rule:</span>
-  </div>
-</div>
+        function partOf(p) { return PARTS[p] || PARTS.parta; }
 
-<!-- MAIN -->
-<main class="main" id="mainContent"></main>
+        const DEFAULT_RULES = [
+          {
+            id: "rule1", num: 1, title: "Application", part: "parta", notes: [],
+            content: `<h3>Rule 1 (a) – Scope of Application</h3><p>These Rules shall apply to:</p><ul><li>All <span class="hl">VESSELS</span></li><li>Upon the <span class="hl">HIGH SEAS</span> and;</li><li>In all <span class="hl">WATERS CONNECTED THEREWITH</span> and</li><li><span class="hl">NAVIGABLE BY SEAGOING VESSELS</span></li></ul><div class="nb"><strong>HIGH SEAS:</strong> The ocean surface and the water column beyond the <span class="hl">EEZ (Exclusive Economic Zone)</span>. It is considered as "the common heritage of all mankind" and is beyond any national jurisdiction. States can conduct activities in these areas as long as they are for peaceful purposes, such as transit, marine science, and undersea exploration.</div><h3>Rule 1 (b) – Special Rules</h3><p><span class="hl">SPECIAL RULES</span> are local rules which apply to:</p><ul><li><span class="hl">ROADSTEADS</span></li><li><span class="hl">HARBOURS</span></li><li><span class="hl">RIVERS</span></li><li><span class="hl">LAKES</span></li><li><span class="hl">INLAND WATERWAYS</span></li></ul><p>Local regulations can be found in: <span class="hl">SAILING DIRECTIONS</span>, <span class="hl">PILOT BOOKS</span>, <span class="hl">GUIDE TO PORT ENTRY</span>, etc.</p><h3>Rule 1 (c) – Government Special Rules</h3><p>Nothing in these Rules shall interfere with the operation of any <span class="hl">SPECIAL RULES MADE BY THE GOVERNMENT</span> of any State with respect to <span class="hl">ADDITIONAL STATION OR SIGNAL LIGHTS, SHAPES OR WHISTLE SIGNALS</span> for:</p><ul><li><span class="hl">SHIPS OF WAR</span></li><li><span class="hl">VESSELS PROCEEDING UNDER CONVOY</span></li><li><span class="hl">FISHING VESSELS ENGAGED IN FISHING AS A FLEET</span></li><li><span class="hl">LASH-VESSELS</span></li><li><span class="hl">FLOATING DRILL DERRICKS</span></li><li><span class="hl">FLOATING DOCKS</span>, <span class="hl">DRACONES</span>, <span class="hl">BRITISH SUBMARINES</span>, <span class="hl">AIRCRAFT-CARRIERS</span>, etc.</li></ul><p>These additional signals shall, so far as possible, be such that they <strong>cannot be mistaken</strong> for any light, shape or signal authorized elsewhere under these Rules.</p><h3>Rule 1 (d) – Traffic Separation Schemes</h3><p><span class="hl">TRAFFIC SEPARATION SCHEMES</span> may be adopted by the <span class="hl">ORGANIZATION (IMO)</span> for the purpose of these Rules.</p><h3>Rule 1 (e) – Vessels of Special Construction</h3><p>Whenever the Government concerned has determined that a <span class="hl">VESSEL OF SPECIAL CONSTRUCTION</span> or purpose cannot comply fully with the provisions regarding the number, position, range or arc of visibility of <span class="hl">LIGHTS OR SHAPES</span>, as well as the disposition and characteristics of <span class="hl">SOUND-SIGNALLING APPLIANCES</span>, such vessel shall comply with the closest possible compliance as determined by her Government.</p>`
+          },
+          {
+            id: "rule2", num: 2, title: "Responsibility", part: "parta", notes: [],
+            content: `<h3>Rule 2 (a)</h3><p>Nothing in these Rules shall <span class="hl">EXONERATE</span> any vessel, or the <span class="hl">OWNER, MASTER OR CREW</span> thereof, from the consequences of any <span class="hl">NEGLECT TO COMPLY</span> with these Rules or of the neglect of any precaution which may be required by the <span class="hl">ORDINARY PRACTICE OF SEAMEN</span>, or by the <span class="hl">SPECIAL CIRCUMSTANCES OF THE CASE</span>.</p><div class="nb"><strong>Meaning:</strong> There is no escaping the penalty of not following these rules. Everybody is responsible and no excuses are permitted. This rule was formulated after all the 'ordinary practice of seamen' were written down as part of these rules, but some of the 'ordinary practices' which may have been overlooked are covered by this rule.</div><div class="kp"><strong>Key Point:</strong> Circumstances can dictate a <span class="hl">DEVIATION FROM THESE RULES</span>, like if the seaman thinks that by following the rules in a special situation the action would endanger the ships, in that case, a deviation may be permitted which will not endanger the ships.</div><h3>Rule 2 (b)</h3><p>In construing and complying with these Rules <span class="hl">DUE REGARD</span> shall be had to all <span class="hl">DANGERS OF NAVIGATION AND COLLISION</span> and to any <span class="hl">SPECIAL CIRCUMSTANCES</span>, including the <span class="hl">LIMITATIONS OF THE VESSELS</span> involved, which may make a <span class="hl">DEPARTURE FROM THESE RULES</span> necessary to avoid <span class="hl">IMMEDIATE DANGER</span>.</p><div class="nb"><strong>Meaning:</strong> Pay close attention to the dangers of navigation and to the circumstances which may arise where blindly following these rules may endanger the ships. If required by common sense that to follow the rules would make a situation worse, then an action may be taken which are different from these rules but would have ensured safety for the vessels.</div>`
+          },
+          {
+            id: "rule3", num: 3, title: "General Definitions", part: "parta", notes: [],
+            content: `<p>For the purpose of these Rules, except where the context otherwise requires:</p><h3>(a) VESSEL</h3><p>Includes every description of water craft, including <span class="hl">NON-DISPLACEMENT CRAFT</span>, <span class="hl">WIG CRAFT</span> and <span class="hl">SEAPLANES</span>, used or capable of being used as a means of transportation on water.</p><h3>(b) POWER-DRIVEN VESSEL</h3><p>Any vessel propelled by <span class="hl">MACHINERY</span>.</p><h3>(c) SAILING VESSEL</h3><p>Any vessel under sail provided that <span class="hl">PROPELLING MACHINERY, IF FITTED, IS NOT BEING USED</span>.</p><h3>(d) VESSEL ENGAGED IN FISHING</h3><p>Any vessel fishing with <span class="hl">NETS, LINES, TRAWLS</span> or other fishing apparatus which <span class="hl">RESTRICT MANOEUVRABILITY</span>, but does <strong>not</strong> include a vessel fishing with <span class="hl">TROLLING LINES</span> or other fishing apparatus which do not restrict manoeuvrability.</p><h3>(e) SEAPLANE</h3><p>Includes any aircraft designed to manoeuvre on the water.</p><h3>(f) VESSEL NOT UNDER COMMAND</h3><p>A vessel which through some <span class="hl">EXCEPTIONAL CIRCUMSTANCE</span> is unable to manoeuvre as required by these Rules and is therefore unable to keep out of the way of another vessel.</p><h3>(g) VESSEL RESTRICTED IN HER ABILITY TO MANOEUVRE</h3><p>A vessel which from the <span class="hl">NATURE OF HER WORK</span> is restricted in her ability to manoeuvre. Includes but not limited to:</p><ul><li>(i) Vessel engaged in <span class="hl">LAYING, SERVICING OR PICKING UP</span> a navigation mark, submarine cable or pipeline</li><li>(ii) Vessel engaged in <span class="hl">DREDGING, SURVEYING OR UNDERWATER OPERATIONS</span></li><li>(iii) Vessel engaged in <span class="hl">REPLENISHMENT OR TRANSFERRING</span> persons, provisions or cargo while underway</li><li>(iv) Vessel engaged in the <span class="hl">LAUNCHING OR RECOVERY OF AIRCRAFT</span></li><li>(v) Vessel engaged in <span class="hl">MINE CLEARANCE OPERATIONS</span></li><li>(vi) Vessel engaged in a <span class="hl">TOWING OPERATION</span> such as severely restricts the towing vessel and her tow in their ability to deviate from their course</li></ul><h3>(h) VESSEL CONSTRAINED BY HER DRAUGHT</h3><p>A <span class="hl">POWER-DRIVEN VESSEL</span> which, because of her draught in relation to the <span class="hl">AVAILABLE DEPTH AND WIDTH</span> of navigable water, is severely restricted in her ability to deviate from the course she is following.</p><h3>(i) UNDERWAY</h3><p>Means that a vessel is <strong>not</strong> at <span class="hl">ANCHOR</span>, or <span class="hl">MADE FAST TO THE SHORE</span>, or <span class="hl">AGROUND</span>.</p><h3>(j) LENGTH AND BREADTH</h3><p>Mean her <span class="hl">LENGTH OVERALL</span> and <span class="hl">GREATEST BREADTH</span>.</p><h3>(k) IN SIGHT OF ONE ANOTHER</h3><p>Vessels shall be deemed to be in sight of one another only when one can be <span class="hl">OBSERVED VISUALLY</span> from the other.</p><h3>(l) RESTRICTED VISIBILITY</h3><p>Any condition in which visibility is restricted by <span class="hl">FOG, MIST, FALLING SNOW, HEAVY RAINSTORMS, SANDSTORMS</span> or any other similar causes.</p><h3>(m) WING-IN-GROUND (WIG) CRAFT</h3><p>A <span class="hl">MULTIMODAL CRAFT</span> which, in its main operational mode, flies in close proximity to the surface by utilizing <span class="hl">SURFACE-EFFECT ACTION</span>.</p>`
+          },
+          // ... (To save space in this response, I'm abbreviating the middle rules. The full content will be in the script block below)
+          {
+            id: "rule4", num: 4, title: "Application", part: "partb1", notes: [],
+            content: `<p>Rules in this section apply in <span class="hl">ANY CONDITION OF VISIBILITY</span>.</p><div class="nb"><strong>VISIBILITY</strong> – the measure of the distance at which an object or light can be clearly discerned.</div><h3>Visibility Range Scale</h3><table><tr><th>Term</th><th>Meaning</th></tr><tr><td><span class="hl">GOOD</span></td><td>More than 5 nautical miles</td></tr><tr><td><span class="hl">MODERATE</span></td><td>2 to 5 nautical miles</td></tr><tr><td><span class="hl">POOR</span></td><td>1000 metres to 2 nautical miles</td></tr><tr><td><span class="hl">VERY POOR</span></td><td>Less than 1000 metres</td></tr><tr><td><span class="hl">FOG</span></td><td>Less than 1000m</td></tr><tr><td><span class="hl">THICK FOG</span></td><td>Less than 200m</td></tr><tr><td><span class="hl">DENSE FOG</span></td><td>Less than 50m</td></tr></table>`
+          },
+          {
+            id: "rule5", num: 5, title: "Look-out", part: "partb1", notes: [],
+            content: `<p>Every vessel shall at all times maintain a <span class="hl">PROPER LOOK-OUT</span> by <span class="hl">SIGHT AND HEARING</span> as well as by <span class="hl">ALL AVAILABLE MEANS</span> appropriate in the prevailing circumstances and conditions so as to make a <span class="hl">FULL APPRAISAL</span> of the situation and of the <span class="hl">RISK OF COLLISION</span>.</p><div class="kp"><strong>Key Point:</strong> The look-out must be maintained at <strong>all times</strong> — not just during restricted visibility. It includes the use of radar, AIS, VHF, and any other equipment available. The look-out should be a dedicated person whose sole duty is to keep watch.</div>`
+          },
+          {
+            id: "rule6", num: 6, title: "Safe Speed", part: "partb1", notes: [],
+            content: `<p>All vessel shall at all times proceed at a <span class="hl">SAFE SPEED</span> so that she can take proper and effective action to <span class="hl">AVOID COLLISION</span> and be <span class="hl">STOPPED WITHIN A DISTANCE</span> appropriate to the prevailing circumstances and conditions.</p><h3>Factors to consider – By all vessels:</h3><ul><li>(i) The <span class="hl">STATE OF VISIBILITY</span></li><li>(ii) The <span class="hl">TRAFFIC DENSITY</span> including concentrations of fishing vessels or any other vessels</li><li>(iii) The <span class="hl">MANEUVERABILITY</span> of the vessel with special reference to <span class="hl">STOPPING DISTANCE</span> and <span class="hl">TURNING ABILITY</span></li><li>(iv) At night the presence of <span class="hl">BACKGROUND LIGHT</span> such as from shore lights or from back scatter of her own lights</li><li>(v) The state of <span class="hl">WIND, SEA AND CURRENT</span>, and the proximity of <span class="hl">NAVIGATIONAL HAZARDS</span></li><li>(vi) The <span class="hl">DRAUGHT</span> in relation to the available <span class="hl">DEPTH OF WATER</span></li></ul><h3>Factors to consider – Additionally, by vessels with operational radar:</h3><ul><li>(i) The <span class="hl">CHARACTERISTICS, EFFICIENCY AND LIMITATIONS</span> of the radar equipment</li><li>(ii) Any <span class="hl">CONSTRAINTS IMPOSED BY THE RADAR RANGE SCALE</span> in use</li><li>(iii) The effect on <span class="hl">RADAR DETECTION</span> on the sea state, weather and other sources of interference</li><li>(iv) The possibility that <span class="hl">SMALL VESSELS, ICE AND OTHER FLOATING OBJECTS</span> may not be detected by radar at an adequate range</li><li>(v) The <span class="hl">NUMBER, LOCATION AND MOVEMENT</span> of vessels detected by radar</li><li>(vi) The more exact <span class="hl">ASSESSMENT OF THE VISIBILITY</span> that may be possible when radar is used to determine the range of vessels or other objects in the vicinity</li></ul>`
+          },
+          {
+            id: "rule7", num: 7, title: "Risk of Collision", part: "partb1", notes: [],
+            content: `<p>(a) Every vessel shall use <span class="hl">ALL AVAILABLE MEANS</span> appropriate to the prevailing circumstances and conditions to determine if <span class="hl">RISK OF COLLISION</span> exists. If there is any doubt such risk shall be <span class="hl">DEEMED TO EXIST</span>.</p><p>(b) Proper use shall be made of <span class="hl">RADAR EQUIPMENT</span> if fitted and operational, including <span class="hl">LONG RANGE SCANNING</span> to obtain early warning of risk of collision and <span class="hl">RADAR PLOTTING</span> or equivalent systematic observation of detected objects.</p><p>(c) <span class="hl">ASSUMPTIONS SHALL NOT BE MADE</span> on the basis of <span class="hl">SCANTY INFORMATION</span>, especially on scanty radar information.</p><h3>(d) Determining if risk of collision exists:</h3><ul><li>(i) Such risk shall be deemed to exist if the <span class="hl">COMPASS BEARING</span> of an approaching vessel <span class="hl">DOES NOT APPRECIABLY CHANGE</span>.</li><li>(ii) Such risk may sometimes exist even when an <span class="hl">APPRECIABLE BEARING CHANGE</span> is evident, particularly when approaching a <span class="hl">VERY LARGE VESSEL</span> or a <span class="hl">TOW</span> or when approaching a vessel at <span class="hl">CLOSE RANGE</span>.</li></ul>`
+          },
+          {
+            id: "rule8", num: 8, title: "Action to Avoid Collision", part: "partb1", notes: [],
+            content: `<p>(a) Any action to avoid collision shall be <span class="hl">POSITIVE</span>, made in <span class="hl">AMPLE TIME</span> and with due regard to the observance of <span class="hl">GOOD SEAMANSHIP</span>.</p><p>(b) Any <span class="hl">ALTERATION OF COURSE AND/OR SPEED</span> to avoid collision shall be <span class="hl">LARGE ENOUGH TO BE READILY APPARENT</span> to another vessel observing visually or by radar. A <span class="hl">SMALL ALTERATION</span> of course and/or speed <strong>should be avoided</strong>.</p><p>(c) If there is sufficient sea room, <span class="hl">ALTERATION OF COURSE ALONE</span> may be the most effective action to avoid a <span class="hl">CLOSE QUARTER SITUATION</span> provided that it is made in good time, is substantial and does not result in another close quarter situation.</p><p>(d) Action taken shall result in <span class="hl">PASSING AT A SAFE DISTANCE</span>. The effectiveness of the action shall be carefully checked until the other vessel is <span class="hl">FINALLY PAST AND CLEAR</span>.</p><p>(e) If necessary, a vessel shall <span class="hl">SLACKEN HER SPEED</span> or take all the way off by <span class="hl">STOPPING OR REVERSING</span> her means of propulsion.</p><p>(f) (i) A vessel which, by any of these Rules, is required <span class="hl">NOT TO IMPEDE</span> the passage or safe passage of another vessel shall, when required by the circumstances, take <span class="hl">EARLY ACTION</span> to allow sufficient sea room for the safe passage of the other vessel.</p><p>(f) (ii) A vessel required not to impede the passage of another vessel is <span class="hl">NOT RELIEVED</span> of this obligation if approaching the other vessel so as to involve risk of collision and shall, when taking action, have <span class="hl">FULL REGARD</span> to the action which may be required by the rules of this part.</p><p>(f) (iii) A vessel the passage of which is not to be impeded remains <span class="hl">FULLY OBLIGED</span> to comply with the rules of this part when the two vessels are approaching one another so as to involve risk of collision.</p>`
+          },
+          {
+            id: "rule9", num: 9, title: "Narrow Channels", part: "partb1", notes: [],
+            content: `<p>(a) A vessel proceeding along a <span class="hl">NARROW CHANNEL OR FAIRWAY</span> shall keep as near to the <span class="hl">OUTER LIMIT</span> of the channel or fairway which lies on her <span class="hl">STARBOARD SIDE</span> as is safe and practicable.</p><p>(b) A vessel of <span class="hl">LESS THAN 20M IN LENGTH</span> or a <span class="hl">SAILING VESSEL</span> shall <strong>not impede</strong> the passage of a vessel which can safely navigate only within a narrow channel or fairway.</p><p>(c) A <span class="hl">VESSEL ENGAGED IN FISHING</span> shall <strong>not impede</strong> the passage of any other vessel navigating within a narrow channel or fairway.</p><p>(d) A vessel shall <strong>not cross</strong> a narrow channel or fairway if such crossing <span class="hl">IMPEDES THE PASSAGE</span> of a vessel which can safely navigate only within such channel or fairway. The latter vessel may use the sound signal prescribed in <span class="hl">RULE 34 (d)</span> if in doubt.</p><p>(e)(i) In a narrow channel or fairway when <span class="hl">OVERTAKING</span> can only take place if the vessel to be overtaken has to take action to permit safe passing, the vessel intending to overtake shall indicate her intention by sounding the appropriate signal prescribed in <span class="hl">RULE 34 (c)(i)</span>. The vessel to be overtaken shall, if in agreement, sound the appropriate signal prescribed in Rule 34 (c)(ii) and take steps to permit safe passing. If in doubt she may sound the signals prescribed in Rule 34 (d).</p><p>(e)(ii) This Rule does not relieve the overtaking vessel of her obligation under <span class="hl">RULE 13</span>.</p><p>(f) A vessel nearing a <span class="hl">BEND</span> or an area of a narrow channel or fairway where other vessels may be obscured by an <span class="hl">INTERVENING OBSTRUCTION</span> shall navigate with <span class="hl">PARTICULAR ALERTNESS AND CAUTION</span> and shall sound the appropriate signal prescribed in <span class="hl">RULE 34 (e)</span>.</p><p>(g) Any vessel shall, if the circumstances of the case admit, <span class="hl">AVOID ANCHORING</span> in a narrow channel.</p>`
+          },
+          {
+            id: "rule10", num: 10, title: "Traffic Separation Schemes (TSS)", part: "partb1", notes: [],
+            content: `<p>(a) This Rule applies to traffic separation schemes adopted by the <span class="hl">ORGANIZATION (IMO)</span> and does not relieve any vessel of her obligation under any other rule.</p><p>(b) A vessel using a <span class="hl">TRAFFIC SEPARATION SCHEME</span> shall:</p><ul><li>i. Proceed in the <span class="hl">APPROPRIATE TRAFFIC LANE</span> in the <span class="hl">GENERAL DIRECTION OF TRAFFIC FLOW</span> for that lane.</li><li>ii. So far as practicable keep clear of a <span class="hl">TRAFFIC SEPARATION LINE</span> or <span class="hl">SEPARATION ZONE</span>.</li><li>iii. Normally <span class="hl">JOIN OR LEAVE</span> a traffic lane at the termination of the lane, but when joining or leaving from either side shall do so at as <span class="hl">SMALL AN ANGLE</span> to the general direction of traffic flow as practicable.</li></ul><p>(c) A vessel shall so far as practicable <span class="hl">AVOID CROSSING TRAFFIC LANES</span>, but if obliged to do so shall cross on a heading as nearly as practicable at <span class="hl">RIGHT ANGLES</span> to the general direction of traffic flow.</p><p>(d)(i) A vessel shall <strong>not</strong> use an <span class="hl">INSHORE TRAFFIC ZONE</span> when she can safely use the appropriate traffic lane within the adjacent traffic separation scheme. However, vessels of less than 20 metres in length, sailing vessels and vessels engaged in fishing may use the inshore traffic zone.</p><p>(d)(ii) Notwithstanding sub-paragraph (d)(i), a vessel may use an inshore traffic zone when en route to or from a port, offshore installation or structure, pilot station or any other place situated within the inshore traffic zone, or to avoid <span class="hl">IMMEDIATE DANGER</span>.</p><p>(e) A vessel other than a crossing vessel or a vessel joining or leaving a lane shall <span class="hl">NOT NORMALLY ENTER A SEPARATION ZONE</span> or cross a separation line except: (i) in cases of emergency to avoid immediate danger; (ii) to engage in fishing within a separation zone.</p><p>(f) A vessel navigating in areas near the <span class="hl">TERMINATIONS OF TRAFFIC SEPARATION SCHEMES</span> shall do so with particular caution.</p><p>(g) A vessel shall so far as practicable <span class="hl">AVOID ANCHORING</span> in a traffic separation scheme or in areas near its terminations.</p><p>(h) A vessel not using a traffic separation scheme shall avoid it by as <span class="hl">WIDE A MARGIN AS IS PRACTICABLE</span>.</p><p>(i) A <span class="hl">VESSEL ENGAGED IN FISHING</span> shall not impede the passage of any vessel following a traffic lane.</p><p>(j) A vessel of <span class="hl">LESS THAN 20 METRES IN LENGTH</span> or a <span class="hl">SAILING VESSEL</span> shall not impede the safe passage of a power-driven vessel following a traffic lane.</p><p>(k) A vessel restricted in her ability to manoeuvre when engaged in an operation for the <span class="hl">MAINTENANCE OF SAFETY OF NAVIGATION</span> in a traffic separation scheme is exempted from complying with this Rule to the extent necessary to carry out the operation.</p><p>(l) A vessel restricted in her ability to manoeuvre when engaged in an operation for the <span class="hl">LAYING, SERVICING OR PICKING UP OF A SUBMARINE CABLE</span>, within a traffic separation scheme, is exempted from complying with this Rule to the extent necessary to carry out the operation.</p>`
+          },
+          {
+            id: "rule11", num: 11, title: "Application", part: "partb2", notes: [],
+            content: `<p>Rules in this section apply to vessels <span class="hl">IN SIGHT OF ONE ANOTHER</span>.</p><div class="nb">Vessels shall be deemed to be in sight of another only when one can be <span class="hl">OBSERVED VISUALLY</span> from the other.</div>`
+          },
+          {
+            id: "rule12", num: 12, title: "Sailing Vessels", part: "partb2", notes: [],
+            content: `<div class="nb"><span class="hl">SAILING VESSELS</span> are vessels under sail provided that propelling machinery, if fitted, is not being used.</div><p><strong>(a)</strong> When two <span class="hl">SAILING VESSELS</span> are approaching one another, so as to involve risk of collision, one of them shall keep out of the way of the other as follows:</p><ul><li><strong>(i)</strong> When each has the <span class="hl">WIND ON DIFFERENT SIDE</span>, the vessel which has the wind on the <span class="hl">PORT SIDE</span> shall <span class="hl">KEEP OUT OF THE WAY</span> of the other.</li><li><strong>(ii)</strong> When both have the <span class="hl">WIND ON THE SAME SIDE</span>, the vessel which is to <span class="hl">WINDWARD</span> shall keep out of the way of the vessel which is to <span class="hl">LEEWARD</span>.</li><li><strong>(iii)</strong> If a vessel with the wind on the <span class="hl">PORT SIDE</span> sees a vessel to <span class="hl">WINDWARD</span> and cannot determine with certainty whether the other vessel has the wind on the port or on the starboard side, she shall <span class="hl">KEEP OUT OF THE WAY</span> of the other.</li></ul><p><strong>(b)</strong> For the purposes of this rule the <span class="hl">WINDWARD SIDE</span> shall be deemed to be the side <span class="hl">OPPOSITE TO THAT ON WHICH THE MAINSAIL IS CARRIED</span> or, in the case of a <span class="hl">SQUARE-RIGGED VESSEL</span>, the side opposite to that on which the <span class="hl">LARGEST FORE AND AFT SAIL</span> is carried.</p>`
+          },
+          {
+            id: "rule13", num: 13, title: "Overtaking", part: "partb2", notes: [],
+            content: `<div class="nb">The <span class="hl">OVERTAKING SITUATION</span> is generally regarded as presenting the <strong>least risk</strong> to vessels involved, due to low relative speeds resulting in a more slowly developing situation.</div><p><strong>(a)</strong> Notwithstanding anything contained in Part B Section I and II, any vessel <span class="hl">OVERTAKING</span> any other shall <span class="hl">KEEP OUT OF THE WAY</span> of the vessel being overtaken.</p><p><strong>(b)</strong> A vessel shall be deemed to be overtaking when coming up with another vessel from a direction more than <span class="hl">22.5 DEGREES ABAFT HER BEAM</span>, that is, in such a position that at night she would be able to see only the <span class="hl">STERN LIGHT</span> of that vessel but neither of her <span class="hl">SIDELIGHTS</span>.</p><p><strong>(c)</strong> When a vessel is in any doubt as to whether she is overtaking another, she shall <span class="hl">ASSUME THAT THIS IS THE CASE</span> and act accordingly.</p><p><strong>(d)</strong> Any <span class="hl">SUBSEQUENT ALTERATION OF THE BEARING</span> between the two vessels shall not make the overtaking vessel a crossing vessel or relieve her of the duty of keeping clear until she is <span class="hl">FINALLY PAST AND CLEAR</span>.</p><div class="kp"><strong>Overtaking Notes:</strong> Despite the perception of low risk, overtaking situations frequently require vessels to be in <span class="hl">CLOSE PROXIMITY</span> for extended periods. The rule does not require the overtaking vessel to maneuver in any particular manner, generally allowing it to pass on <span class="hl">EITHER SIDE</span>. Care should be exercised to maintain an appropriate distance to prevent the effects of <span class="hl">INTERACTION</span>.</div>`
+          },
+          {
+            id: "rule14", num: 14, title: "Head-on Situation", part: "partb2", notes: [],
+            content: `<p><strong>(a)</strong> When two <span class="hl">POWER-DRIVEN VESSELS</span> are meeting on a <span class="hl">RECIPROCAL OR NEARLY RECIPROCAL</span> courses so as to involve risk of collision, each shall <span class="hl">ALTER HER COURSE TO STARBOARD</span> so that each shall pass on the <span class="hl">PORT SIDE</span> of the other.</p><p><strong>(b)</strong> Such a situation shall be deemed to exist when a vessel sees the other <span class="hl">AHEAD OR NEARLY AHEAD</span> and by night she could see the <span class="hl">MASTHEAD LIGHTS</span> of the other in a line or nearly in a line and/or <span class="hl">BOTH SIDELIGHTS</span> and by day she observes the corresponding aspect of the vessel.</p><p><strong>(c)</strong> When a vessel is in any doubt as to whether such a situation exists she shall <span class="hl">ASSUME THAT IT DOES</span>.</p><div class="kp"><strong>Key Point:</strong> It is a clear instruction when the vessels are head on perfectly. When the vessels are nearly on reciprocal courses, both vessels are asked to <span class="hl">ALTER COURSE TO STARBOARD</span>. A nearly reciprocal course would deem that the vessels would be passing very close to each other, and the situation could become a <span class="hl">CLOSE QUARTER SITUATION</span>.</div>`
+          },
+          {
+            id: "rule15", num: 15, title: "Crossing Situation", part: "partb2", notes: [],
+            content: `<p>When two <span class="hl">POWER DRIVEN VESSELS</span> are crossing so as to involve risk of collision, the vessel which has the other on her own <span class="hl">STARBOARD SIDE</span> shall <span class="hl">KEEP OUT OF THE WAY</span> and shall, if the circumstances of the case admit, <span class="hl">AVOID CROSSING AHEAD</span> of the other vessel.</p><div class="kp"><strong>Key Point:</strong> It is always better to avoid a <span class="hl">CLOSE QUARTER SITUATION</span> and go right around the <span class="hl">STERN</span> of the other vessel rather than cross ahead. If the situation permits, this should be followed if the crossing would result in a small <span class="hl">CPA (CLOSEST POINT OF APPROACH)</span>.</div>`
+          },
+          {
+            id: "rule16", num: 16, title: "Action by Give-way Vessel", part: "partb2", notes: [],
+            content: `<p>Every vessel which is directed to <span class="hl">KEEP OUT OF THE WAY</span> of another vessel shall, so far as possible, take <span class="hl">EARLY AND SUBSTANTIAL ACTION</span> to keep well clear.</p><div class="kp"><strong>Key Point:</strong> <span class="hl">GIVE WAY VESSELS</span> should take action well in time, estimate the speed of approach between the two vessels, estimate the approximate time interval and then take action. Do not take <span class="hl">LATE ACTION</span>, since this would make the stand on vessel apprehensive and she may then take an action which would be detrimental to both vessels.</div>`
+          },
+          {
+            id: "rule17", num: 17, title: "Action by Stand-on Vessel", part: "partb2", notes: [],
+            content: `<p><strong>(a)(i)</strong> Where one of two vessels is to keep out of the way, the other shall <span class="hl">KEEP HER COURSE AND SPEED</span>.</p><p><strong>(a)(ii)</strong> The latter vessel may however take action to <span class="hl">AVOID COLLISION BY HER MANEUVER ALONE</span>, as soon as it becomes apparent to her that the vessel required to keep out of the way is <strong>not taking appropriate action</strong> in compliance with these Rules.</p><p><strong>(b)</strong> When, from any cause, the vessel required to keep her course and speed finds herself so close that <span class="hl">COLLISION CANNOT BE AVOIDED</span> by the action of the give way vessel alone, she shall take action as well best to <span class="hl">AVOID COLLISION</span>.</p><p><strong>(c)</strong> A power driven vessel which takes action in a <span class="hl">CROSSING SITUATION</span> in accordance with sub paragraph (a)(ii) to avoid collision with another power-driven vessel shall, if the circumstances of the case admit, <span class="hl">NOT ALTER COURSE TO PORT</span> for a vessel on her own port side.</p><p><strong>(d)</strong> This Rule does <strong>not relieve</strong> the <span class="hl">GIVE WAY VESSEL</span> of her obligation to keep out of the way.</p><div class="kp"><strong>Stand-on Vessel Notes:</strong> The <span class="hl">STAND ON VESSEL</span> is required not to take action initially, but it does not mean she would not be alert and monitor the situation. The watch keeper on the stand on vessel must be alert and his <span class="hl">PLAN FOR EVASIVE ACTION</span> should be ready at all instances if the give way vessel fails to take action or if the action is not sufficient.</div>`
+          },
+          {
+            id: "rule18", num: 18, title: "Responsibilities Between Vessels", part: "partb2", notes: [],
+            content: `<p>Except where <span class="hl">RULES 9, 10, AND 13</span> otherwise require:</p><h3>(a) A POWER DRIVEN VESSEL underway shall keep out of the way of:</h3><ul><li>(i) A <span class="hl">VESSEL NOT UNDER COMMAND</span></li><li>(ii) A <span class="hl">VESSEL RESTRICTED IN HER ABILITY TO MANEUVER</span></li><li>(iii) A <span class="hl">VESSEL ENGAGED IN FISHING</span></li><li>(iv) A <span class="hl">SAILING VESSEL</span></li></ul><h3>(b) A SAILING VESSEL underway shall keep out of the way of:</h3><ul><li>(i) A <span class="hl">VESSEL NOT UNDER COMMAND</span></li><li>(ii) A <span class="hl">VESSEL RESTRICTED IN HER ABILITY TO MANEUVER</span></li><li>(iii) A <span class="hl">VESSEL ENGAGED IN FISHING</span></li></ul><h3>(c) A VESSEL ENGAGED IN FISHING when underway shall keep out of the way of:</h3><ul><li>(i) A <span class="hl">VESSEL NOT UNDER COMMAND</span></li><li>(ii) A <span class="hl">VESSEL RESTRICTED IN HER ABILITY TO MANEUVER</span></li></ul><h3>(d) VESSEL CONSTRAINED BY HER DRAUGHT</h3><p>(d)(i) Any vessel other than a <span class="hl">VESSEL NOT UNDER COMMAND</span> or a <span class="hl">VESSEL RESTRICTED IN HER ABILITY TO MANOEUVRE</span> shall, if the circumstances admit, avoid impeding the safe passage of a <span class="hl">VESSEL CONSTRAINED BY HER DRAUGHT</span>, exhibiting the signals in <span class="hl">RULE 28</span>.</p><p>(d)(ii) A <span class="hl">VESSEL CONSTRAINED BY HER DRAUGHT</span> shall navigate with <span class="hl">PARTICULAR CAUTION</span> having full regard to her special condition.</p><h3>(e) SEAPLANE</h3><p>A <span class="hl">SEAPLANE</span> on the water shall, in general keep well clear of all vessels and avoid impeding their navigation.</p><h3>(f) WIG CRAFT</h3><p>(f)(i) A <span class="hl">WIG CRAFT</span> shall, when taking off, landing and in flight near the surface, keep well clear of all other vessels and avoid impeding their navigation.</p><p>(f)(ii) A <span class="hl">WIG CRAFT</span> operating on the water surface shall comply with the Rules of this part as a <span class="hl">POWER-DRIVEN VESSEL</span>.</p><h3>The Give Way Hierarchy (Rule 18)</h3><div class="hierarchy"><div class="hi hi1"><span class="hr">1</span> VESSEL NOT UNDER COMMAND (NUC) – highest priority</div><div class="hi hi2"><span class="hr">2</span> VESSEL RESTRICTED IN ABILITY TO MANOEUVRE (RAM)</div><div class="hi hi3"><span class="hr">3</span> VESSEL ENGAGED IN FISHING</div><div class="hi hi4"><span class="hr">4</span> SAILING VESSEL</div><div class="hi hi5"><span class="hr">5</span> POWER-DRIVEN VESSEL</div><div class="hi hi6"><span class="hr">6</span> SEAPLANE / WIG CRAFT – keeps clear of all</div></div>`
+          },
+          {
+            id: "rule19", num: 19, title: "Conduct of Vessels in Restricted Visibility", part: "partb3", notes: [],
+            content: `<p><strong>(a)</strong> This Rule applies to vessels <span class="hl">NOT IN SIGHT OF ONE ANOTHER</span> when navigating in or near an area of <span class="hl">RESTRICTED VISIBILITY</span>.</p><p><strong>(b)</strong> Every vessel shall proceed at a <span class="hl">SAFE SPEED</span> adapted to the prevailing circumstances and conditions of restricted visibility. A power-driven vessel shall have her <span class="hl">ENGINES READY FOR IMMEDIATE MANOEUVRE</span>.</p><p><strong>(c)</strong> Every vessel shall have <span class="hl">DUE REGARD</span> to the prevailing circumstances and conditions of restricted visibility when complying with the Rules of Section I of this Part.</p><p><strong>(d)</strong> A vessel which detects by <span class="hl">RADAR ALONE</span> the presence of another vessel shall determine if a close-quarters situation is developing and/or risk of collision exists. If so, she shall take <span class="hl">AVOIDING ACTION IN AMPLE TIME</span>, provided that when such action consists of an alteration of course, so far as possible the following shall be avoided:</p><ul><li>(i) An alteration of course to <span class="hl">PORT</span> for a vessel <span class="hl">FORWARD OF THE BEAM</span>, other than for a vessel being overtaken;</li><li>(ii) An alteration of course <span class="hl">TOWARDS A VESSEL ABEAM OR ABAFT THE BEAM</span>.</li></ul><p><strong>(e)</strong> Except where it has been determined that a risk of collision does not exist, every vessel which hears apparently <span class="hl">FORWARD OF HER BEAM</span> the fog signal of another vessel, or which cannot avoid a close-quarters situation with another vessel forward of her beam, shall <span class="hl">REDUCE HER SPEED</span> to the minimum at which she can be kept on her course. She shall if necessary <span class="hl">TAKE ALL HER WAY OFF</span> and in any event navigate with <span class="hl">EXTREME CAUTION</span> until danger of collision is over.</p><div class="kp"><strong>Key Point:</strong> In restricted visibility, the concepts of "stand-on" and "give-way" vessels do NOT apply. Every vessel must take action to avoid collision. The Rule emphasizes the use of radar and requires engines to be ready for immediate manoeuvre.</div>`
+          },
+          {
+            id: "rule20", num: 20, title: "Application (Lights and Shapes)", part: "partc", notes: [],
+            content: `<p><strong>(a)</strong> Rules in this Part shall be complied with in <span class="hl">ALL WEATHERS</span>.</p><p><strong>(b)</strong> The Rules concerning <span class="hl">LIGHTS</span> shall be complied with from <span class="hl">SUNSET TO SUNRISE</span>, and during such times no other lights shall be exhibited, except such lights as cannot be mistaken for the lights specified in these Rules or do not impair their visibility or distinctive character, or interfere with the keeping of a proper look-out.</p><p><strong>(c)</strong> The lights prescribed by these Rules shall, if carried, also be exhibited from <span class="hl">SUNRISE TO SUNSET</span> in <span class="hl">RESTRICTED VISIBILITY</span> and may be exhibited in all other circumstances when it is deemed necessary.</p><p><strong>(d)</strong> The Rules concerning <span class="hl">SHAPES</span> shall be complied with by <span class="hl">DAY</span>.</p><p><strong>(e)</strong> The lights and shapes specified in these Rules shall comply with the provisions of <span class="hl">ANNEX I</span> to these Regulations.</p>`
+          },
+          {
+            id: "rule21", num: 21, title: "Definitions of Lights", part: "partc", notes: [],
+            content: `<h3>(a) MASTHEAD LIGHT</h3><p>A <span class="hl">WHITE LIGHT</span> placed over the fore and aft centreline of the vessel showing an unbroken light over an arc of the horizon of <span class="hl">225 DEGREES</span> and so fixed as to show the light from right ahead to 22.5 degrees abaft the beam on either side of the vessel.</p><h3>(b) SIDELIGHTS</h3><p>A <span class="hl">GREEN LIGHT</span> on the <span class="hl">STARBOARD SIDE</span> and a <span class="hl">RED LIGHT</span> on the <span class="hl">PORT SIDE</span> each showing an unbroken light over an arc of the horizon of <span class="hl">112.5 DEGREES</span> and so fixed as to show the light from right ahead to 22.5 degrees abaft the beam on its respective side.</p><h3>(c) STERN LIGHT</h3><p>A <span class="hl">WHITE LIGHT</span> placed as nearly as practicable at the stern showing an unbroken light over an arc of the horizon of <span class="hl">135 DEGREES</span> and so fixed as to show the light 67.5 degrees from right aft on each side of the vessel.</p><h3>(d) TOWING LIGHT</h3><p>A <span class="hl">YELLOW LIGHT</span> having the same characteristics as the "stern light" defined in paragraph (c).</p><h3>(e) ALL-ROUND LIGHT</h3><p>A light showing an unbroken light over an arc of the horizon of <span class="hl">360 DEGREES</span>.</p><h3>(f) FLASHING LIGHT</h3><p>A light flashing at <span class="hl">REGULAR INTERVALS</span> at a frequency of <span class="hl">120 FLASHES OR MORE PER MINUTE</span>.</p><table><tr><th>Light</th><th>Color</th><th>Arc</th></tr><tr><td>Masthead</td><td>White</td><td>225°</td></tr><tr><td>Sidelights</td><td>Green (Stbd) / Red (Port)</td><td>112.5° each</td></tr><tr><td>Stern Light</td><td>White</td><td>135°</td></tr><tr><td>Towing Light</td><td>Yellow</td><td>135°</td></tr><tr><td>All-round</td><td>Various</td><td>360°</td></tr><tr><td>Flashing</td><td>Various</td><td>360° / ≥120 flashes/min</td></tr></table>`
+          },
+          {
+            id: "rule22", num: 22, title: "Visibility of Lights", part: "partc", notes: [],
+            content: `<p>The lights prescribed in these Rules shall have an intensity as specified in <span class="hl">ANNEX I</span> so as to be visible at the following <span class="hl">MINIMUM RANGES</span>:</p><h3>(a) In vessels of 50 metres or more in length:</h3><ul><li>Masthead light: <span class="hl">6 MILES</span></li><li>Sidelight: <span class="hl">3 MILES</span></li><li>Stern light: <span class="hl">3 MILES</span></li><li>Towing light: <span class="hl">3 MILES</span></li><li>White, red, green or yellow all-round light: <span class="hl">3 MILES</span></li></ul><h3>(b) In vessels of 12 metres or more but less than 50 metres in length:</h3><ul><li>Masthead light: <span class="hl">5 MILES</span>; where length &lt; 20m: <span class="hl">3 MILES</span></li><li>Sidelight: <span class="hl">2 MILES</span></li><li>Stern light: <span class="hl">2 MILES</span></li><li>Towing light: <span class="hl">2 MILES</span></li><li>White, red, green or yellow all-round light: <span class="hl">2 MILES</span></li></ul><h3>(c) In vessels of less than 12 metres in length:</h3><ul><li>Masthead light: <span class="hl">2 MILES</span></li><li>Sidelight: <span class="hl">1 MILE</span></li><li>Stern light: <span class="hl">2 MILES</span></li><li>Towing light: <span class="hl">2 MILES</span></li><li>White, red, green or yellow all-round light: <span class="hl">2 MILES</span></li></ul><h3>(d) In inconspicuous, partly submerged vessels or objects being towed:</h3><ul><li>White all-round light: <span class="hl">3 MILES</span></li></ul>`
+          },
+          {
+            id: "rule23", num: 23, title: "Power-driven Vessels Underway", part: "partc", notes: [],
+            content: `<p><strong>(a)</strong> A <span class="hl">POWER-DRIVEN VESSEL</span> underway shall exhibit:</p><ul><li>(i) A <span class="hl">MASTHEAD LIGHT</span> forward;</li><li>(ii) A <span class="hl">SECOND MASTHEAD LIGHT</span> abaft of and higher than the forward one; except that a vessel of less than 50 metres in length shall not be obliged to exhibit such light but may do so;</li><li>(iii) <span class="hl">SIDELIGHTS</span>; and</li><li>(iv) A <span class="hl">STERN LIGHT</span>.</li></ul><p><strong>(b)</strong> An <span class="hl">AIR-CUSHION VESSEL</span> when operating in the non-displacement mode shall, in addition, exhibit an <span class="hl">ALL-ROUND FLASHING YELLOW LIGHT</span>.</p><p><strong>(c)</strong> A WIG craft only when taking off, landing and in flight near the surface shall, in addition to the lights prescribed in paragraph (a), exhibit a <span class="hl">HIGH INTENSITY ALL-ROUND FLASHING RED LIGHT</span>.</p><p><strong>(d)(i)</strong> A power-driven vessel of less than <span class="hl">12 METRES IN LENGTH</span> may in lieu of the lights prescribed in paragraph (a) exhibit an <span class="hl">ALL-ROUND WHITE LIGHT</span> and sidelights.</p><p><strong>(d)(ii)</strong> A power-driven vessel of less than <span class="hl">7 METRES IN LENGTH</span> whose maximum speed does not exceed 7 knots may in lieu exhibit an <span class="hl">ALL-ROUND WHITE LIGHT</span> and shall, if practicable, also exhibit sidelights.</p><p><strong>(d)(iii)</strong> The masthead light or all-round white light on a vessel of less than 12 metres in length may be displaced from the fore and aft centreline if centreline fitting is not practicable, provided that the sidelights are combined in one lantern carried on the fore and aft centreline.</p>`
+          },
+          {
+            id: "rule24", num: 24, title: "Towing and Pushing", part: "partc", notes: [],
+            content: `<p><strong>(a)</strong> A power-driven vessel when <span class="hl">TOWING</span> shall exhibit:</p><ul><li>(i) Instead of the light prescribed in Rule 23(a)(i) or (a)(ii), <span class="hl">TWO MASTHEAD LIGHTS</span> in a vertical line. When the length of the tow, measuring from the stern of the towing vessel to the after end of the tow exceeds <span class="hl">200 METRES</span>, <span class="hl">THREE SUCH LIGHTS</span> in a vertical line;</li><li>(ii) <span class="hl">SIDELIGHTS</span>;</li><li>(iii) A <span class="hl">STERN LIGHT</span>;</li><li>(iv) A <span class="hl">TOWING LIGHT</span> in a vertical line above the stern light;</li><li>(v) When the length of the tow exceeds 200 metres, a <span class="hl">DIAMOND SHAPE</span> where it can best be seen.</li></ul><p><strong>(b)</strong> When a pushing vessel and a vessel being pushed ahead are rigidly connected in a <span class="hl">COMPOSITE UNIT</span>, they shall be regarded as a power-driven vessel and exhibit the lights prescribed in Rule 23.</p><p><strong>(c)</strong> A power-driven vessel when <span class="hl">PUSHING AHEAD</span> or towing alongside, except in the case of a composite unit, shall exhibit:</p><ul><li>(i) Instead of the light prescribed in Rule 23(a)(i) or (a)(ii), <span class="hl">TWO MASTHEAD LIGHTS</span> in a vertical line;</li><li>(ii) Sidelights; (iii) A stern light.</li></ul><p><strong>(e)</strong> A vessel or object being towed, other than those mentioned in paragraph (g), shall exhibit:</p><ul><li>(i) <span class="hl">SIDELIGHTS</span>;</li><li>(ii) A <span class="hl">STERN LIGHT</span>;</li><li>(iii) When the length of the tow exceeds 200 metres, a <span class="hl">DIAMOND SHAPE</span> where it can best be seen.</li></ul><div class="kp"><strong>Key Point:</strong> The number of masthead lights (2 or 3) on the towing vessel indicates whether the tow length exceeds 200 metres — critical information for other vessels assessing the situation.</div>`
+          },
+          {
+            id: "rule25", num: 25, title: "Sailing Vessels Underway and Vessels Under Oars", part: "partc", notes: [],
+            content: `<p><strong>(a)</strong> A <span class="hl">SAILING VESSEL</span> underway shall exhibit:</p><ul><li>(i) <span class="hl">SIDELIGHTS</span>;</li><li>(ii) A <span class="hl">STERN LIGHT</span>.</li></ul><p><strong>(b)</strong> In a sailing vessel of less than <span class="hl">20 METRES IN LENGTH</span> the lights prescribed in paragraph (a) may be combined in <span class="hl">ONE LANTERN</span> carried at or near the top of the mast where it can best be seen.</p><p><strong>(c)</strong> A sailing vessel underway may, in addition to the lights prescribed in paragraph (a), exhibit at or near the top of the mast, where they can best be seen, <span class="hl">TWO ALL-ROUND LIGHTS</span> in a vertical line, the upper being <span class="hl">RED</span> and the lower <span class="hl">GREEN</span>. These lights shall not be exhibited in conjunction with the combined lantern permitted by paragraph (b).</p><p><strong>(d)(i)</strong> A sailing vessel of less than <span class="hl">7 METRES IN LENGTH</span> shall, if practicable, exhibit the lights prescribed in paragraph (a) or (b), but if she does not, she shall have ready at hand an electric torch or lighted lantern showing a <span class="hl">WHITE LIGHT</span> which shall be exhibited in sufficient time to prevent collision.</p><p><strong>(d)(ii)</strong> A vessel <span class="hl">UNDER OARS</span> may exhibit the lights prescribed in this Rule for sailing vessels, but if she does not, she shall have ready at hand an electric torch or lighted lantern showing a white light which shall be exhibited in sufficient time to prevent collision.</p><p><strong>(e)</strong> A vessel proceeding under sail when also being propelled by machinery shall exhibit forward where it can best be seen a <span class="hl">CONICAL SHAPE, APEX DOWNWARDS</span>.</p>`
+          },
+          {
+            id: "rule26", num: 26, title: "Fishing Vessels", part: "partc", notes: [],
+            content: `<p><strong>(a)</strong> A vessel engaged in fishing, whether underway or at anchor, shall exhibit only the lights and shapes prescribed in this Rule.</p><p><strong>(b)</strong> A vessel when engaged in <span class="hl">TRAWLING</span> (dragging through water a dredge net or apparatus used as a fishing appliance) shall exhibit:</p><ul><li>(i) Two <span class="hl">ALL-ROUND LIGHTS</span> in a vertical line, the upper being <span class="hl">GREEN</span> and the lower <span class="hl">WHITE</span>, or a shape consisting of two cones with their apexes together in a vertical line one above the other;</li><li>(ii) A <span class="hl">MASTHEAD LIGHT</span> abaft of and higher than the all-round green light; a vessel of less than 50 metres in length shall not be obliged to exhibit such a light but may do so;</li><li>(iii) When making way through the water, in addition to the lights prescribed in this paragraph, <span class="hl">SIDELIGHTS</span> and a <span class="hl">STERN LIGHT</span>.</li></ul><p><strong>(c)</strong> A vessel engaged in fishing, other than trawling, shall exhibit:</p><ul><li>(i) Two <span class="hl">ALL-ROUND LIGHTS</span> in a vertical line, the upper being <span class="hl">RED</span> and the lower <span class="hl">WHITE</span>, or a shape consisting of two cones with apexes together;</li><li>(ii) When there is outlying gear extending more than <span class="hl">150 METRES</span> horizontally from the vessel, an <span class="hl">ALL-ROUND WHITE LIGHT</span> or a cone apex upwards in the direction of the gear;</li><li>(iii) When making way through the water, sidelights and a stern light.</li></ul><p><strong>(d)</strong> The additional signals described in <span class="hl">ANNEX II</span> apply to vessels engaged in fishing in close proximity to other vessels.</p><p><strong>(e)</strong> A vessel when <span class="hl">NOT ENGAGED IN FISHING</span> shall not exhibit the lights or shapes prescribed in this Rule, but only those prescribed for a vessel of her length.</p>`
+          },
+          {
+            id: "rule27", num: 27, title: "Vessels Not Under Command or Restricted in Ability to Manoeuvre", part: "partc", notes: [],
+            content: `<p><strong>(a)</strong> A <span class="hl">VESSEL NOT UNDER COMMAND</span> shall exhibit:</p><ul><li>(i) Two <span class="hl">ALL-ROUND RED LIGHTS</span> in a vertical line where they can best be seen;</li><li>(ii) Two <span class="hl">BALLS</span> or similar shapes in a vertical line where they can best be seen;</li><li>(iii) When making way through the water, in addition, <span class="hl">SIDELIGHTS</span> and a <span class="hl">STERN LIGHT</span>.</li></ul><p><strong>(b)</strong> A <span class="hl">VESSEL RESTRICTED IN HER ABILITY TO MANOEUVRE</span>, except a vessel engaged in mine clearance operations, shall exhibit:</p><ul><li>(i) Three <span class="hl">ALL-ROUND LIGHTS</span> in a vertical line where they can best be seen. The highest and lowest of these lights shall be <span class="hl">RED</span> and the middle light shall be <span class="hl">WHITE</span>;</li><li>(ii) Three <span class="hl">SHAPES</span> in a vertical line where they can best be seen. The highest and lowest shall be <span class="hl">BALLS</span> and the middle one a <span class="hl">DIAMOND</span>;</li><li>(iii) When making way through the water, a masthead light or lights, sidelights and a stern light, in addition;</li><li>(iv) When at anchor, in addition, the light, lights or shapes prescribed in Rule 30.</li></ul><p><strong>(c)</strong> A power-driven vessel engaged in a towing operation such as severely restricts the towing vessel and her tow in their ability to deviate from their course shall, in addition to the lights prescribed in Rule 24(a), exhibit the lights or shapes prescribed in sub-paragraphs (b)(i) and (ii).</p><p><strong>(d)</strong> A vessel engaged in <span class="hl">DREDGING OR UNDERWATER OPERATIONS</span>, when restricted in ability to manoeuvre, shall exhibit the lights and shapes prescribed in sub-paragraphs (b)(i), (ii) and (iii) and shall in addition, when an obstruction exists, exhibit:</p><ul><li>(i) Two all-round <span class="hl">RED LIGHTS</span> or two balls in a vertical line to indicate the side on which the obstruction exists;</li><li>(ii) Two all-round <span class="hl">GREEN LIGHTS</span> or two diamonds in a vertical line to indicate the side on which another vessel may pass.</li></ul><p><strong>(e)</strong> Whenever the size of a vessel engaged in diving operations makes it impracticable to exhibit all lights and shapes, a rigid replica of the International Code flag <span class="hl">"A"</span> not less than 1 metre in height shall be exhibited. Measures shall be taken to ensure all-round visibility.</p><p><strong>(f)</strong> A vessel engaged in <span class="hl">MINE CLEARANCE OPERATIONS</span> shall exhibit three all-round <span class="hl">GREEN LIGHTS</span> or three balls — one at the foremast head and one at each end of the fore yard. These lights or shapes indicate that it is dangerous to approach within <span class="hl">1000 METRES</span> of the mine clearance vessel.</p><p><strong>(g)</strong> Vessels of less than 12 metres in length, except those engaged in diving operations, shall not be required to exhibit the lights and shapes prescribed in this Rule.</p><p><strong>(h)</strong> The signals prescribed in this Rule are not signals of vessels in distress and requiring assistance. Such signals are contained in <span class="hl">ANNEX IV</span>.</p>`
+          },
+          {
+            id: "rule28", num: 28, title: "Vessels Constrained by Their Draught", part: "partc", notes: [],
+            content: `<p>A vessel <span class="hl">CONSTRAINED BY HER DRAUGHT</span> may, in addition to the lights prescribed for power-driven vessels in Rule 23, exhibit where they can best be seen <span class="hl">THREE ALL-ROUND RED LIGHTS</span> in a vertical line, or a <span class="hl">CYLINDER</span>.</p><div class="nb"><strong>Note:</strong> This signal is optional ("may exhibit") and is only applicable to power-driven vessels. It indicates to other vessels that due to the vessel's draught in relation to the available depth and width of navigable water, the vessel is severely restricted in her ability to deviate from her course.</div>`
+          },
+          {
+            id: "rule29", num: 29, title: "Pilot Vessels", part: "partc", notes: [],
+            content: `<p><strong>(a)</strong> A vessel engaged on <span class="hl">PILOTAGE DUTY</span> shall exhibit:</p><ul><li>(i) At or near the masthead, two <span class="hl">ALL-ROUND LIGHTS</span> in a vertical line, the upper being <span class="hl">WHITE</span> and the lower being <span class="hl">RED</span>;</li><li>(ii) When underway, in addition, <span class="hl">SIDELIGHTS</span> and a <span class="hl">STERN LIGHT</span>;</li><li>(iii) When at anchor, in addition to the lights prescribed in sub-paragraph (i), the <span class="hl">ANCHOR LIGHT, LIGHTS OR SHAPE</span> prescribed in Rule 30 for vessels at anchor.</li></ul><p><strong>(b)</strong> A pilot vessel when <span class="hl">NOT ENGAGED ON PILOTAGE DUTY</span> shall exhibit the lights or shapes prescribed for a similar vessel of her length.</p>`
+          },
+          {
+            id: "rule30", num: 30, title: "Anchored Vessels and Vessels Aground", part: "partc", notes: [],
+            content: `<p><strong>(a)</strong> A vessel <span class="hl">AT ANCHOR</span> shall exhibit where it can best be seen:</p><ul><li>(i) In the <span class="hl">FORE PART</span>, an all-round <span class="hl">WHITE LIGHT</span> or one <span class="hl">BALL</span>;</li><li>(ii) At or near the stern and at a lower level than the light prescribed in sub-paragraph (i), an all-round <span class="hl">WHITE LIGHT</span>.</li></ul><p><strong>(b)</strong> A vessel of less than <span class="hl">50 METRES IN LENGTH</span> may exhibit an <span class="hl">ALL-ROUND WHITE LIGHT</span> where it can best be seen instead of the lights prescribed in paragraph (a).</p><p><strong>(c)</strong> A vessel at anchor may, and a vessel of <span class="hl">100 METRES AND MORE IN LENGTH</span> shall, also use the available working or equivalent lights to illuminate her decks.</p><p><strong>(d)</strong> A vessel <span class="hl">AGROUND</span> shall exhibit the lights prescribed in paragraph (a) or (b) and in addition, where they can best be seen:</p><ul><li>(i) Two <span class="hl">ALL-ROUND RED LIGHTS</span> in a vertical line;</li><li>(ii) Three <span class="hl">BALLS</span> in a vertical line.</li></ul><p><strong>(e)</strong> A vessel of less than <span class="hl">7 METRES IN LENGTH</span>, when at anchor, not in or near a narrow channel, fairway or anchorage, or where other vessels normally navigate, shall not be required to exhibit the lights or shapes prescribed in paragraphs (a) and (b).</p><p><strong>(f)</strong> A vessel of less than <span class="hl">12 METRES IN LENGTH</span>, when aground, shall not be required to exhibit the lights or shapes prescribed in sub-paragraphs (d)(i) and (ii).</p>`
+          },
+          {
+            id: "rule31", num: 31, title: "Seaplanes", part: "partc", notes: [],
+            content: `<p>Where it is impracticable for a <span class="hl">SEAPLANE</span> or a <span class="hl">WIG CRAFT</span> to exhibit lights and shapes of the characteristics or in the positions prescribed in the Rules of this Part, she shall exhibit lights and shapes as closely similar in characteristics and position as is possible.</p>`
+          },
+          {
+            id: "rule32", num: 32, title: "Definitions (Sound Signals)", part: "partd", notes: [],
+            content: `<p><strong>(a)</strong> The word <span class="hl">"WHISTLE"</span> means any sound signalling appliance capable of producing the prescribed blasts and which complies with the specifications in <span class="hl">ANNEX III</span> to these Regulations.</p><p><strong>(b) SHORT BLAST</strong> – a blast of about <span class="hl">ONE SECOND'S</span> duration.</p><p><strong>(c) PROLONGED BLAST</strong> – a blast of from <span class="hl">FOUR TO SIX SECONDS'</span> duration.</p><table><tr><th>Signal</th><th>Duration</th></tr><tr><td><span class="hl">Short Blast (•)</span></td><td>~1 second</td></tr><tr><td><span class="hl">Prolonged Blast (—)</span></td><td>4 to 6 seconds</td></tr></table>`
+          },
+          {
+            id: "rule33", num: 33, title: "Equipment for Sound Signals", part: "partd", notes: [],
+            content: `<p><strong>(a)</strong> A vessel of <span class="hl">12 METRES OR MORE IN LENGTH</span> shall be provided with a <span class="hl">WHISTLE</span>, a vessel of <span class="hl">20 METRES OR MORE IN LENGTH</span> shall be provided with a <span class="hl">BELL</span> in addition to a whistle, and a vessel of <span class="hl">100 METRES OR MORE IN LENGTH</span> shall, in addition, be provided with a <span class="hl">GONG</span>, the tone and sound of which cannot be confused with that of the bell.</p><p><strong>(b)</strong> A vessel of less than <span class="hl">12 METRES IN LENGTH</span> shall not be obliged to carry the sound signalling appliances prescribed above but, if she does not, shall be provided with some other means of making an <span class="hl">EFFICIENT SOUND SIGNAL</span>.</p><table><tr><th>Vessel Length</th><th>Required Equipment</th></tr><tr><td>≥ 100m</td><td>Whistle + Bell + Gong</td></tr><tr><td>≥ 20m &lt; 100m</td><td>Whistle + Bell</td></tr><tr><td>≥ 12m &lt; 20m</td><td>Whistle</td></tr><tr><td>&lt; 12m</td><td>Some means of efficient sound signal</td></tr></table>`
+          },
+          {
+            id: "rule34", num: 34, title: "Manoeuvring and Warning Signals", part: "partd", notes: [],
+            content: `<p><strong>(a)</strong> When vessels are <span class="hl">IN SIGHT OF ONE ANOTHER</span>, a power-driven vessel underway, when manoeuvring as authorized or required by these Rules, shall indicate that manoeuvre by the following signals on her whistle:</p><ul><li><span class="hl">ONE SHORT BLAST (•)</span> – I am altering my course to <span class="hl">STARBOARD</span></li><li><span class="hl">TWO SHORT BLASTS (••)</span> – I am altering my course to <span class="hl">PORT</span></li><li><span class="hl">THREE SHORT BLASTS (•••)</span> – I am operating <span class="hl">ASTERN PROPULSION</span></li></ul><p><strong>(b)</strong> Any vessel may supplement the whistle signals with <span class="hl">LIGHT SIGNALS</span> repeated as appropriate:</p><ul><li>One flash – altering course to starboard</li><li>Two flashes – altering course to port</li><li>Three flashes – operating astern propulsion</li></ul><p>The duration of each flash shall be about <span class="hl">ONE SECOND</span>, the interval between flashes about one second, and the interval between successive signals not less than <span class="hl">TEN SECONDS</span>. The light shall be an <span class="hl">ALL-ROUND WHITE LIGHT</span> visible at a minimum range of 5 miles, and shall comply with Annex I.</p><p><strong>(c)</strong> When in sight of one another in a <span class="hl">NARROW CHANNEL OR FAIRWAY</span>:</p><ul><li>(i) <span class="hl">TWO PROLONGED BLASTS FOLLOWED BY ONE SHORT BLAST (— — •)</span> – I intend to overtake you on your <span class="hl">STARBOARD SIDE</span></li><li>(i) <span class="hl">TWO PROLONGED BLASTS FOLLOWED BY TWO SHORT BLASTS (— — ••)</span> – I intend to overtake you on your <span class="hl">PORT SIDE</span></li><li>(ii) <span class="hl">ONE PROLONGED, ONE SHORT, ONE PROLONGED, ONE SHORT BLAST (— • — •)</span> – Agreement by the vessel being overtaken</li></ul><p><strong>(d)</strong> When vessels in sight of one another are approaching each other and from any cause either vessel fails to understand the intentions or actions of the other, or is in doubt whether sufficient action is being taken to avoid collision, the vessel in doubt shall immediately indicate such doubt by giving at least <span class="hl">FIVE SHORT AND RAPID BLASTS (•••••)</span> on the whistle. This signal may be supplemented by a light signal of at least five short and rapid flashes.</p><p><strong>(e)</strong> A vessel nearing a <span class="hl">BEND</span> or an area of a channel or fairway where other vessels may be obscured by an intervening obstruction shall sound <span class="hl">ONE PROLONGED BLAST (—)</span>. Such signal shall be answered with a prolonged blast by any approaching vessel that may be within hearing around the bend or behind the obstruction.</p>`
+          },
+          {
+            id: "rule35", num: 35, title: "Sound Signals in Restricted Visibility", part: "partd", notes: [],
+            content: `<p>In or near an area of <span class="hl">RESTRICTED VISIBILITY</span>, whether by day or night, the following signals shall be used:</p><p><strong>(a)</strong> A <span class="hl">POWER-DRIVEN VESSEL MAKING WAY</span> through the water shall sound at intervals of not more than <span class="hl">2 MINUTES</span>: <span class="hl">ONE PROLONGED BLAST (—)</span>.</p><p><strong>(b)</strong> A <span class="hl">POWER-DRIVEN VESSEL UNDERWAY BUT STOPPED</span> and making no way through the water shall sound at intervals of not more than 2 minutes: <span class="hl">TWO PROLONGED BLASTS (— —)</span> in succession with an interval of about 2 seconds between them.</p><p><strong>(c)</strong> A vessel <span class="hl">NOT UNDER COMMAND</span>, a vessel <span class="hl">RESTRICTED IN HER ABILITY TO MANOEUVRE</span>, a vessel <span class="hl">CONSTRAINED BY HER DRAUGHT</span>, a <span class="hl">SAILING VESSEL</span>, a vessel <span class="hl">ENGAGED IN FISHING</span> and a vessel engaged in towing or pushing another vessel shall, instead of the signals prescribed in paragraphs (a) or (b), sound at intervals of not more than 2 minutes: <span class="hl">ONE PROLONGED FOLLOWED BY TWO SHORT BLASTS (— ••)</span>.</p><p><strong>(d)</strong> A vessel engaged in fishing, when at anchor, and a vessel restricted in her ability to manoeuvre when carrying out her work at anchor, shall instead of the signals prescribed in paragraph (g) sound the signal prescribed in paragraph (c).</p><p><strong>(e)</strong> A vessel <span class="hl">TOWED</span> or if more than one vessel is towed the last vessel of the tow, if manned, shall at intervals of not more than 2 minutes sound <span class="hl">ONE PROLONGED FOLLOWED BY THREE SHORT BLASTS (— •••)</span>. When practicable, this signal shall be made immediately after the signal made by the towing vessel.</p><p><strong>(f)</strong> When a pushing vessel and a vessel being pushed ahead are rigidly connected in a composite unit they shall be regarded as a power-driven vessel and shall give the signals prescribed in paragraphs (a) or (b).</p><p><strong>(g)</strong> A vessel <span class="hl">AT ANCHOR</span> shall at intervals of not more than one minute <span class="hl">RING THE BELL RAPIDLY</span> for about 5 seconds. In a vessel of 100 metres or more in length the bell shall be sounded in the forepart and immediately after the ringing of the bell the <span class="hl">GONG</span> shall be sounded rapidly for about 5 seconds in the after part.</p><p><strong>(h)</strong> A vessel <span class="hl">AGROUND</span> shall give the bell signal and if required the gong signal prescribed in paragraph (g) and shall, in addition, give <span class="hl">THREE SEPARATE AND DISTINCT STROKES ON THE BELL</span> immediately before and after the rapid ringing of the bell.</p><p><strong>(i)</strong> A vessel of 12 metres or more but less than 20 metres in length shall not be obliged to give the bell signals prescribed above. However, if she does not, she shall make some other <span class="hl">EFFICIENT SOUND SIGNAL</span> at intervals of not more than 2 minutes.</p><p><strong>(j)</strong> A vessel of less than 12 metres in length shall not be obliged to give the above-mentioned signals but, if she does not, shall make some other efficient sound signal at intervals of not more than 2 minutes.</p><p><strong>(k)</strong> A <span class="hl">PILOT VESSEL</span> when engaged on pilotage duty may in addition to the signals prescribed in paragraphs (a), (b) or (g) sound an <span class="hl">IDENTITY SIGNAL</span> consisting of four short blasts.</p><table><tr><th>Vessel Type / Status</th><th>Fog Signal</th><th>Interval</th></tr><tr><td>PDV making way</td><td>— (1 prolonged)</td><td>≤ 2 min</td></tr><tr><td>PDV stopped</td><td>— — (2 prolonged)</td><td>≤ 2 min</td></tr><tr><td>NUC/RAM/CBD/Sail/Fishing/Towing</td><td>— •• (1 prolonged + 2 short)</td><td>≤ 2 min</td></tr><tr><td>Last vessel towed (manned)</td><td>— ••• (1 prolonged + 3 short)</td><td>≤ 2 min</td></tr><tr><td>At anchor</td><td>Bell (5 sec rapid ringing)</td><td>≤ 1 min</td></tr><tr><td>Aground</td><td>3 bell + rapid bell + 3 bell</td><td>≤ 1 min</td></tr><tr><td>Pilot vessel</td><td>•••• (4 short) identity</td><td>Additional</td></tr></table>`
+          },
+          {
+            id: "rule36", num: 36, title: "Signals to Attract Attention", part: "partd", notes: [],
+            content: `<p>If necessary to <span class="hl">ATTRACT THE ATTENTION</span> of another vessel, any vessel may make <span class="hl">LIGHT OR SOUND SIGNALS</span> that cannot be mistaken for any signal authorized elsewhere in these Rules, or may direct the beam of her searchlight in the direction of the danger, in such a way as not to embarrass any vessel. Any light to attract the attention of another vessel shall be such that it cannot be mistaken for any <span class="hl">AID TO NAVIGATION</span>. For the purpose of this Rule the use of <span class="hl">HIGH INTENSITY INTERMITTENT OR REVOLVING LIGHTS</span>, such as strobe lights, shall be avoided.</p>`
+          },
+          {
+            id: "rule37", num: 37, title: "Distress Signals", part: "partd", notes: [],
+            content: `<p>When a vessel is <span class="hl">IN DISTRESS</span> and requires assistance she shall use or exhibit the signals described in <span class="hl">ANNEX IV</span> to these Regulations.</p><div class="kp"><strong>Key Point:</strong> A vessel shall not use any of the distress signals contained in Annex IV except for the purpose of indicating distress and need of assistance, and shall not use signals which may be confused with any of the distress signals.</div>`
+          },
+          {
+            id: "rule38", num: 38, title: "Exemptions", part: "parte", notes: [],
+            content: `<p>Any vessel (or class of vessels) provided that she complies with the requirements of the International Regulations for Preventing Collisions at Sea, 1960, the keel of which is laid or which is at a corresponding stage of construction before the entry into force of these Regulations may be exempted from compliance therewith as follows:</p><p><strong>(a)</strong> The installation of lights with ranges prescribed in <span class="hl">RULE 22</span>, until <span class="hl">4 YEARS</span> after the date of entry into force of these Regulations.</p><p><strong>(b)</strong> The installation of lights with colour specifications as prescribed in <span class="hl">SECTION 7 OF ANNEX I</span>, until <span class="hl">4 YEARS</span> after the date of entry into force of these Regulations.</p><p><strong>(c)</strong> The repositioning of lights as a result of conversion from <span class="hl">IMPERIAL TO METRIC UNITS</span> and rounding off measurement figures, permanent exemption.</p><p><strong>(d)(i)</strong> The repositioning of <span class="hl">MASTHEAD LIGHTS</span> on vessels of less than 150 metres in length, resulting from the prescriptions of Section 3(a) of Annex I, permanent exemption.</p><p><strong>(d)(ii)</strong> The repositioning of masthead lights on vessels of <span class="hl">150 METRES OR MORE IN LENGTH</span>, resulting from the prescriptions of Section 3(a) of Annex I, until <span class="hl">9 YEARS</span> after the date of entry into force of these Regulations.</p><p><strong>(e)</strong> The repositioning of <span class="hl">MASTHEAD LIGHTS</span> resulting from the prescriptions of Section 2(b) of Annex I, until <span class="hl">9 YEARS</span> after the date of entry into force of these Regulations.</p><p><strong>(f)</strong> The repositioning of <span class="hl">SIDELIGHTS</span> resulting from the prescriptions of Sections 2(g) and 3(b) of Annex I, until <span class="hl">9 YEARS</span> after the date of entry into force of these Regulations.</p><p><strong>(g)</strong> The requirements for <span class="hl">SOUND SIGNAL APPLIANCES</span> prescribed in <span class="hl">ANNEX III</span>, until <span class="hl">9 YEARS</span> after the date of entry into force of these Regulations.</p><p><strong>(h)</strong> The repositioning of <span class="hl">ALL-ROUND LIGHTS</span> resulting from the prescription of Section 9(b) of Annex I, permanent exemption.</p>`
+          },
+          {
+            id: "rule39", num: 39, title: "Definitions (Verification)", part: "partf", notes: [],
+            content: `<p>For the purposes of this Part:</p><p><strong>(a)</strong> <span class="hl">AUDIT</span> means a systematic, independent and documented process for obtaining audit evidence and evaluating it objectively to determine the extent to which audit criteria are fulfilled.</p><p><strong>(b)</strong> <span class="hl">AUDIT SCHEME</span> means the IMO Member State Audit Scheme established by the Organization and taking into account the guidelines developed by the Organization.</p><p><strong>(c)</strong> <span class="hl">CODE FOR IMPLEMENTATION</span> means the IMO Instruments Implementation Code (III Code) adopted by the Organization.</p><p><strong>(d)</strong> <span class="hl">AUDIT STANDARD</span> means the Code for Implementation.</p><div class="nb"><strong>Note:</strong> Part F was added by amendments adopted in 2013 and entered into force on 1 January 2016. It establishes a mandatory audit scheme for verifying that Contracting Governments are implementing and enforcing the COLREGS.</div>`
+          },
+          {
+            id: "rule40", num: 40, title: "Application (Verification)", part: "partf", notes: [],
+            content: `<p>Contracting Governments shall use the provisions of the <span class="hl">CODE FOR IMPLEMENTATION</span> in the execution of their obligations and responsibilities contained in the present Regulations.</p><div class="kp"><strong>Key Point:</strong> This rule makes it mandatory for Contracting Governments to implement the III Code when discharging their obligations under COLREGS. This ensures a standardized approach to implementation across all member states.</div>`
+          },
+          {
+            id: "rule41", num: 41, title: "Verification of Compliance", part: "partf", notes: [],
+            content: `<p><strong>(a)</strong> Every Contracting Government shall be subject to <span class="hl">PERIODIC AUDITS</span> by the Organization in accordance with the audit standard to verify compliance with and implementation of the present Regulations.</p><p><strong>(b)</strong> The <span class="hl">SECRETARY-GENERAL OF THE ORGANIZATION</span> shall have responsibility for administration of the Audit Scheme, based on the guidelines developed by the Organization.</p><p><strong>(c)</strong> Every Contracting Government shall have responsibility for facilitating the conduct of the audit and implementation of a programme of actions to address the findings, based on the guidelines developed by the Organization.</p><p><strong>(d)</strong> Audit of all Contracting Governments shall be:</p><ul><li>(i) based on an overall schedule developed by the Secretary-General, taking into account the guidelines developed by the Organization; and</li><li>(ii) conducted at <span class="hl">PERIODIC INTERVALS</span>, taking into account the guidelines developed by the Organization.</li></ul><div class="nb"><strong>Note:</strong> The mandatory IMO audit scheme ensures that all Contracting Governments are implementing COLREGS effectively. The audits are designed to identify areas where improvements are needed and to promote a consistent global approach to maritime safety.</div>`
+          },
+          {
+            id: "annexI", num: 100, title: "Annex I – Positioning and Technical Details of Lights and Shapes", part: "annex1", notes: [],
+            content: `<h3>1. Definition</h3><p>The term <span class="hl">"HEIGHT ABOVE THE HULL"</span> means height above the uppermost continuous deck. This height shall be measured from the position vertically beneath the location of the light.</p><h3>2. Vertical Positioning and Spacing of Lights</h3><p>(a) On a power-driven vessel of 20 metres or more in length the masthead lights shall be placed as follows:</p><ul><li>(i) The <span class="hl">FORWARD MASTHEAD LIGHT</span>, or if only one masthead light is carried, then that light, at a height above the hull of not less than <span class="hl">6 METRES</span>, and, if the breadth of the vessel exceeds 6 metres, then at a height above the hull of not less than such breadth, so however that the light need not be placed at a height of more than <span class="hl">12 METRES</span> above the hull.</li><li>(ii) When <span class="hl">TWO MASTHEAD LIGHTS</span> are carried the after one shall be at least <span class="hl">4.5 METRES</span> vertically higher than the forward one.</li></ul><p>(b) The vertical separation of masthead lights of power-driven vessels shall be such that in all normal conditions of trim the after light will be seen over and separate from the forward light at a distance of <span class="hl">1000 METRES</span> from the stem when viewed from sea level.</p><p>(f) <span class="hl">SIDELIGHTS</span>: On a power-driven vessel of 20 metres or more in length the sidelights shall not be placed in front of the forward masthead lights. They shall be placed at or near the side of the vessel.</p><p>(g) The sidelights of a power-driven vessel shall be placed at a height above the hull of not more than <span class="hl">THREE QUARTERS</span> of that of the forward masthead light.</p><h3>3. Horizontal Positioning and Spacing of Lights</h3><p>(a) When two masthead lights are prescribed for a power-driven vessel, the <span class="hl">HORIZONTAL DISTANCE</span> between them shall be not less than one half of the length of the vessel but need not be more than <span class="hl">100 METRES</span>. The forward light shall be placed not more than one quarter of the length of the vessel from the stem.</p><p>(b) On a power-driven vessel of 20 metres or more in length the sidelights shall not be placed in front of the forward masthead lights.</p><h3>5. Screens for Sidelights</h3><p>The sidelights of vessels of 20 metres or more in length shall be fitted with inboard screens painted <span class="hl">MATT BLACK</span> and meeting the requirements of Section 9.</p><h3>7. Colour Specification of Lights</h3><p>The chromaticity of all navigation lights shall conform to the following standards within the boundaries of the area of the diagram specified for each colour by the <span class="hl">INTERNATIONAL COMMISSION ON ILLUMINATION (CIE)</span>.</p><h3>8. Intensity of Lights</h3><p>The minimum luminous intensity of lights shall be calculated using the formula: <span class="hl">I = 3.43 × 10⁶ × T × D² × K⁻ᴰ</span> where T is threshold factor, D is range of visibility in nautical miles, and K is atmospheric transmissivity.</p><h3>9. Horizontal Sectors</h3><p>Sidelights as fitted on the vessel shall show the minimum required intensities. In the sector between 1 degree and 3 degrees outside the prescribed sectors, the intensity shall decrease to practical cut-off.</p><h3>10. Vertical Sectors</h3><p>The vertical sectors of electric lights as fitted, with the exception of lights on sailing vessels underway and on vessels of less than 20 metres, shall ensure that the required minimum intensity is maintained at all angles from <span class="hl">5 DEGREES ABOVE TO 5 DEGREES BELOW</span> the horizontal.</p><h3>13. High-speed Craft</h3><p>The masthead light of high-speed craft may be placed at a height related to the breadth of the craft lower than that prescribed, provided that the base angle of the isosceles triangles formed by the sidelights and masthead light, when seen in end elevation, is not less than <span class="hl">27 DEGREES</span>.</p><h3>14. Shapes</h3><ul><li>Balls: diameter not less than <span class="hl">0.6 METRES</span></li><li>Cones: base diameter not less than <span class="hl">0.6 METRES</span> and height equal to diameter</li><li>Cylinder: diameter not less than <span class="hl">0.6 METRES</span> and height twice the diameter</li><li>Diamond: two cones as defined above having a common base</li></ul><p>The vertical distance between shapes shall be at least <span class="hl">1.5 METRES</span>. In a vessel of less than 20 metres in length, shapes of lesser dimensions but commensurate with the size of the vessel may be used and the distance apart may be correspondingly reduced.</p>`
+          },
+          {
+            id: "annexII", num: 200, title: "Annex II – Additional Signals for Fishing Vessels Fishing in Close Proximity", part: "annex2", notes: [],
+            content: `<h3>1. General</h3><p>The lights mentioned in this Annex shall, if exhibited in pursuance of <span class="hl">RULE 26 (d)</span>, be placed where they can best be seen. They shall be at least <span class="hl">0.9 METRES APART</span> but at a lower level than lights prescribed in Rule 26(b)(i) and (c)(i). The lights shall be visible all round the horizon at a distance of at least <span class="hl">1 MILE</span> but at a lesser distance than the lights prescribed by these Rules for fishing vessels.</p><h3>2. Signals for Trawlers</h3><p>(a) Vessels of <span class="hl">20 METRES OR MORE IN LENGTH</span> when engaged in trawling, whether using demersal or pelagic gear, shall exhibit:</p><ul><li>(i) When shooting their nets: two <span class="hl">WHITE LIGHTS</span> in a vertical line;</li><li>(ii) When hauling their nets: one <span class="hl">WHITE LIGHT</span> over one <span class="hl">RED LIGHT</span> in a vertical line;</li><li>(iii) When the net has come fast upon an obstruction: two <span class="hl">RED LIGHTS</span> in a vertical line.</li></ul><p>(b) Each vessel of 20 metres or more in length engaged in <span class="hl">PAIR TRAWLING</span> may exhibit:</p><ul><li>(i) By night, a <span class="hl">SEARCHLIGHT</span> directed forward and in the direction of the other vessel of the pair;</li><li>(ii) When shooting or hauling their nets or when their nets have come fast upon an obstruction, the lights prescribed above.</li></ul><p>(c) A vessel of <span class="hl">LESS THAN 20 METRES</span> in length engaged in trawling may exhibit the lights prescribed above.</p><h3>3. Signals for Purse Seiners</h3><p>Vessels engaged in fishing with <span class="hl">PURSE SEINE GEAR</span> may exhibit two <span class="hl">YELLOW LIGHTS</span> in a vertical line. These lights shall flash alternately every second and with equal light and occultation duration. These lights may only be exhibited when the vessel is hampered by its fishing gear.</p>`
+          },
+          {
+            id: "annexIII", num: 300, title: "Annex III – Technical Details of Sound Signal Appliances", part: "annex3", notes: [],
+            content: `<h3>1. Whistles</h3><p><strong>(a) Frequencies and Range of Audibility</strong></p><p>The fundamental frequency of the signal shall be within the range <span class="hl">70–700 Hz</span>. The range of audibility shall be determined by those frequencies, which may include the fundamental and/or one or more higher frequencies, which lie in the range <span class="hl">180–700 Hz</span> (±1%) for a vessel of 20 metres or more in length, or <span class="hl">180–2100 Hz</span> (±1%) for a vessel of less than 20 metres in length, and which provide the sound pressure levels specified below.</p><table><tr><th>Vessel Length</th><th>Fundamental Frequency</th><th>Audibility Range</th></tr><tr><td>200m or more</td><td>70–200 Hz</td><td>2 nautical miles</td></tr><tr><td>75m – 200m</td><td>130–350 Hz</td><td>1.5 nautical miles</td></tr><tr><td>20m – 75m</td><td>250–700 Hz</td><td>1 nautical mile</td></tr><tr><td>Less than 20m</td><td>250–700 Hz</td><td>0.5 nautical mile</td></tr></table><p><strong>(b) Directional Properties</strong></p><p>The sound pressure level of a directional whistle shall be not more than <span class="hl">4 dB BELOW</span> the prescribed sound pressure level in any direction in the horizontal plane.</p><p><strong>(c) Positioning of Whistles</strong></p><p>When a directional whistle is to be used as the only whistle on a vessel, it shall be installed with its <span class="hl">MAXIMUM INTENSITY</span> directed straight ahead.</p><h3>2. Bell or Gong</h3><p><strong>(a)</strong> The bell or gong, or their substitute, shall be made of <span class="hl">CORROSION-RESISTANT MATERIAL</span> and designed to give a clear tone. The diameter of the mouth of the bell shall be not less than <span class="hl">300 MM</span> for vessels of 20 metres or more in length, and shall be not less than <span class="hl">200 MM</span> for vessels of 12 metres or more but of less than 20 metres in length.</p><p><strong>(b)</strong> The mass of the striker shall be not less than <span class="hl">3 PER CENT</span> of the mass of the bell.</p><h3>3. Approval</h3><p>The construction of sound signal appliances, their performance and their installation on board the vessel shall be to the satisfaction of the appropriate authority of the State whose <span class="hl">FLAG THE VESSEL IS ENTITLED TO FLY</span>.</p>`
+          },
+          {
+            id: "annexIV", num: 400, title: "Annex IV – Distress Signals", part: "annex4", notes: [],
+            content: `<h3>1. Distress Signals</h3><p>The following signals, used or exhibited either together or separately, indicate <span class="hl">DISTRESS AND NEED OF ASSISTANCE</span>:</p><ul><li>(a) A gun or other <span class="hl">EXPLOSIVE SIGNAL</span> fired at intervals of about a minute;</li><li>(b) A continuous sounding with any <span class="hl">FOG-SIGNALLING APPARATUS</span>;</li><li>(c) <span class="hl">ROCKETS OR SHELLS</span>, throwing red stars fired one at a time at short intervals;</li><li>(d) A signal made by any signalling method consisting of the group <span class="hl">• • • — — — • • • (SOS)</span> in the Morse Code;</li><li>(e) A signal sent by radiotelephony consisting of the spoken word <span class="hl">"MAYDAY"</span>;</li><li>(f) The International Code Signal of distress indicated by <span class="hl">N.C. (NOVEMBER CHARLIE)</span>;</li><li>(g) A signal consisting of a <span class="hl">SQUARE FLAG</span> having above or below it a ball or anything resembling a ball;</li><li>(h) <span class="hl">FLAMES</span> on the vessel (as from a burning tar barrel, oil barrel, etc.);</li><li>(i) A <span class="hl">ROCKET PARACHUTE FLARE</span> or a hand flare showing a <span class="hl">RED LIGHT</span>;</li><li>(j) A <span class="hl">SMOKE SIGNAL</span> giving off <span class="hl">ORANGE-COLOURED SMOKE</span>;</li><li>(k) Slowly and repeatedly raising and lowering <span class="hl">ARMS OUTSTRETCHED</span> to each side;</li><li>(l) A <span class="hl">DISTRESS ALERT</span> by means of digital selective calling (DSC) transmitted on:<ul><li>VHF channel 70, or</li><li>MF/HF on the frequencies 2187.5 kHz, 8414.5 kHz, or any other available DSC frequency;</li></ul></li><li>(m) A <span class="hl">SHIP-TO-SHORE DISTRESS ALERT</span> transmitted by the ship's Inmarsat or other mobile satellite service provider ship earth station;</li><li>(n) Signals transmitted by <span class="hl">EMERGENCY POSITION-INDICATING RADIO BEACONS (EPIRBs)</span>;</li><li>(o) Approved signals transmitted by <span class="hl">RADIOCOMMUNICATION SYSTEMS</span>, including survival craft radar transponders.</li></ul><h3>2. Prohibition</h3><p>The use or exhibition of any of the foregoing signals except for the purpose of indicating distress and need of assistance and the use of other signals which may be confused with any of the above signals is <span class="hl">PROHIBITED</span>.</p><h3>3. Attention</h3><p>Attention is drawn to the relevant sections of the <span class="hl">INTERNATIONAL CODE OF SIGNALS</span>, the <span class="hl">IAMSAR MANUAL</span>, and the following signals:</p><ul><li>(a) A piece of <span class="hl">ORANGE-COLOURED CANVAS</span> with either a black square and circle or other appropriate symbol (for identification from the air);</li><li>(b) A <span class="hl">DYE MARKER</span>.</li></ul><div class="kp"><strong>Key Point:</strong> Distress signals must ONLY be used to indicate actual distress. Using distress signals for any other purpose is a violation of international maritime law. All vessels observing distress signals are obligated to render assistance as far as they are able to do so without serious danger to their own vessel, crew, and passengers.</div>`
+          }
+        ];
 
-<!-- FOOTER -->
-<footer class="footer">
-  <p>Convention on the International Regulations for Preventing Collisions at Sea, 1972 (COLREGs)</p>
-  <p>CO1: Demonstrate thorough knowledge and understanding of the content, application and intent of the COLREGS.</p>
-  <p style="color:#1e293b;margin-top:.5rem">Data is saved automatically in your browser's local storage.</p>
-</footer>
+        const SUMMARY_DATA = [
+          { section: "Part A – General", items: [
+            { r: "Rule 1", t: "Application: COLREGS apply to all vessels on the high seas and connected waters navigable by seagoing vessels." },
+            { r: "Rule 2", t: "Responsibility: No one is exonerated from complying. Departure from rules permitted only to avoid immediate danger." },
+            { r: "Rule 3", t: "General Definitions: Defines vessel, power-driven vessel, sailing vessel, NUC, RAM, constrained by draught, etc." },
+          ]},
+          { section: "Part B Section I – Any Condition of Visibility", items: [
+            { r: "Rule 4", t: "Applies in any condition of visibility." },
+            { r: "Rule 5", t: "Proper look-out at all times by sight, hearing, and all available means." },
+            { r: "Rule 6", t: "Safe speed considering visibility, traffic, manoeuvrability, and radar factors." },
+            { r: "Rule 7", t: "Use all available means to determine risk of collision. If in doubt, risk exists." },
+            { r: "Rule 8", t: "Action must be positive, in ample time, and large enough to be apparent." },
+            { r: "Rule 9", t: "Keep to starboard in narrow channels. Vessels <20m, sailing vessels, and fishing vessels shall not impede." },
+            { r: "Rule 10", t: "Follow TSS traffic lanes, cross at right angles, avoid anchoring in TSS." },
+          ]},
+          { section: "Part B Section II – Vessels in Sight", items: [
+            { r: "Rule 11", t: "Applies to vessels in sight of one another (visual observation)." },
+            { r: "Rule 12", t: "Sailing vessel rules: port tack gives way, windward gives way, doubt = give way." },
+            { r: "Rule 13", t: "Overtaking: overtaking vessel keeps clear (>22.5° abaft beam)." },
+            { r: "Rule 14", t: "Head on: both alter to starboard, pass port to port." },
+            { r: "Rule 15", t: "Crossing: vessel with other on starboard side gives way, avoid crossing ahead." },
+            { r: "Rule 16", t: "Give way vessel: take early and substantial action." },
+            { r: "Rule 17", t: "Stand on vessel: maintain course and speed, but may act if give way vessel fails." },
+            { r: "Rule 18", t: "Hierarchy: NUC > RAM > Fishing > Sailing > Power-driven > Seaplane/WIG." },
+          ]},
+          { section: "Part B Section III – Restricted Visibility", items: [
+            { r: "Rule 19", t: "Conduct in restricted visibility: safe speed, engines ready, radar-based avoidance, no port turn for vessel forward of beam." },
+          ]},
+          { section: "Part C – Lights and Shapes", items: [
+            { r: "Rule 20", t: "Application: lights from sunset to sunrise, shapes by day, comply with Annex I." },
+            { r: "Rule 21", t: "Definitions: masthead (225°), sidelights (112.5°), stern (135°), towing (yellow 135°), all-round (360°), flashing (≥120/min)." },
+            { r: "Rule 22", t: "Visibility of lights: minimum ranges from 1 to 6 miles depending on vessel size." },
+            { r: "Rule 23", t: "Power-driven vessels: masthead, sidelights, stern light; special provisions for <12m and <7m." },
+            { r: "Rule 24", t: "Towing/pushing: 2 or 3 masthead lights, towing light, diamond shape if tow >200m." },
+            { r: "Rule 25", t: "Sailing vessels: sidelights and stern light; optional red/green at masthead; cone apex down if motor-sailing." },
+            { r: "Rule 26", t: "Fishing vessels: trawling = green over white; other fishing = red over white; Annex II for close proximity." },
+            { r: "Rule 27", t: "NUC: two red all-round. RAM: red-white-red all-round, ball-diamond-ball shapes. Dredging: red/green side signals." },
+            { r: "Rule 28", t: "Constrained by draught: three all-round red lights or cylinder (optional)." },
+            { r: "Rule 29", t: "Pilot vessels: white over red all-round lights." },
+            { r: "Rule 30", t: "At anchor: white all-round fore + stern; aground: add two red all-round + three balls." },
+            { r: "Rule 31", t: "Seaplanes and WIG craft: exhibit lights as closely similar as practicable." },
+          ]},
+          { section: "Part D – Sound and Light Signals", items: [
+            { r: "Rule 32", t: "Definitions: short blast ~1 sec, prolonged blast 4–6 sec." },
+            { r: "Rule 33", t: "Equipment: ≥100m needs whistle+bell+gong; ≥20m whistle+bell; ≥12m whistle." },
+            { r: "Rule 34", t: "Manoeuvring signals: 1 short=starboard, 2 short=port, 3 short=astern; 5+ short=doubt/warning." },
+            { r: "Rule 35", t: "Fog signals: PDV making way=1 prolonged; stopped=2 prolonged; NUC/RAM/sail/fishing=1 prolonged+2 short." },
+            { r: "Rule 36", t: "Signals to attract attention: light or sound not mistaken for other signals." },
+            { r: "Rule 37", t: "Distress signals: as described in Annex IV." },
+          ]},
+          { section: "Part E – Exemptions", items: [
+            { r: "Rule 38", t: "Exemptions for vessels built before COLREGS entry into force, with time-limited and permanent exemptions." },
+          ]},
+          { section: "Part F – Verification of Compliance", items: [
+            { r: "Rule 39", t: "Definitions for audit, audit scheme, code for implementation, and audit standard." },
+            { r: "Rule 40", t: "Contracting Governments shall use the III Code for implementation." },
+            { r: "Rule 41", t: "Periodic audits by IMO to verify compliance; Secretary-General administers the scheme." },
+          ]},
+          { section: "Annexes", items: [
+            { r: "Annex I", t: "Positioning and technical details of lights and shapes: heights, spacings, colours, intensities, sectors." },
+            { r: "Annex II", t: "Additional signals for fishing vessels in close proximity: trawlers, pair trawlers, purse seiners." },
+            { r: "Annex III", t: "Technical details of sound signal appliances: whistle frequencies, bell/gong specifications." },
+            { r: "Annex IV", t: "Distress signals: 15 recognized signals including SOS, Mayday, EPIRB, flares, DSC alerts." },
+          ]},
+        ];
 
-<!-- TOAST -->
-<div class="toast hidden" id="toast"></div>
+        const STORAGE_KEY = "colregs_full_v4";
 
-<!-- MODAL -->
-<div class="modal-overlay hidden" id="modalOverlay">
-  <div class="modal">
-    <div class="modal-header">
-      <h3 id="modalTitle">Add New Rule</h3>
-      <button class="modal-close" id="modalClose">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-row">
-        <div>
-          <label>Rule Number</label>
-          <input type="number" id="formNum" min="1" max="99" placeholder="e.g. 19">
-        </div>
-        <div>
-          <label>Part</label>
-          <select id="formPart">
-            <option value="parta">Part A – General</option>
-            <option value="partb1">Part B Section I</option>
-            <option value="partb2">Part B Section II</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Title</label>
-        <input type="text" id="formTitle" placeholder="e.g. Conduct in Restricted Visibility">
-      </div>
-      <div class="form-group">
-        <label>Content (HTML supported)</label>
-        <textarea id="formContent" rows="8" placeholder="Enter rule content..."></textarea>
-        <p class="form-hint">Use &lt;span class="hl"&gt;TEXT&lt;/span&gt; for highlights, &lt;div class="nb"&gt; for notes, &lt;div class="kp"&gt; for key points.</p>
-      </div>
-      <div class="form-actions">
-        <button class="btn-cancel" id="btnCancel">Cancel</button>
-        <button class="btn-save" id="btnSave">Add Rule</button>
-      </div>
-    </div>
-  </div>
-</div>
+        /* ================================================================
+           LOGIC HOOKS
+           ================================================================ */
+        function useRules() {
+          const [rules, setRules] = useState(() => {
+            try {
+              const s = localStorage.getItem(STORAGE_KEY);
+              return s ? JSON.parse(s) : structuredClone(DEFAULT_RULES);
+            } catch { return structuredClone(DEFAULT_RULES); }
+          });
 
-<script>
-/* ================================================================
-   DATA
-   ================================================================ */
-const DEFAULT_RULES = [
-  {id:"rule1",num:1,title:"Application",part:"parta",notes:[],content:`<h3>Rule 1 (a) – Scope of Application</h3><p>These Rules shall apply to:</p><ul><li>All <span class="hl">VESSELS</span></li><li>Upon the <span class="hl">HIGH SEAS</span> and;</li><li>In all <span class="hl">WATERS CONNECTED THEREWITH</span> and</li><li><span class="hl">NAVIGABLE BY SEAGOING VESSELS</span></li></ul><div class="nb"><strong>HIGH SEAS:</strong> The ocean surface and the water column beyond the <span class="hl">EEZ (Exclusive Economic Zone)</span>. It is considered as "the common heritage of all mankind" and is beyond any national jurisdiction.</div><h3>Rule 1 (b) – Special Rules</h3><p><span class="hl">SPECIAL RULES</span> are local rules which apply to:</p><ul><li><span class="hl">ROADSTEADS</span></li><li><span class="hl">HARBOURS</span></li><li><span class="hl">RIVERS</span></li><li><span class="hl">LAKES</span></li><li><span class="hl">INLAND WATERWAYS</span></li></ul><p>Local regulations can be found in: <span class="hl">SAILING DIRECTIONS</span>, <span class="hl">PILOT BOOKS</span>, <span class="hl">GUIDE TO PORT ENTRY</span>, etc.</p><h3>Rule 1 (c) – Government Special Rules</h3><p>Nothing in these Rules shall interfere with the operation of any <span class="hl">SPECIAL RULES MADE BY THE GOVERNMENT</span> of any State with respect to <span class="hl">ADDITIONAL STATION OR SIGNAL LIGHTS, SHAPES OR WHISTLE SIGNALS</span> for:</p><ul><li><span class="hl">SHIPS OF WAR</span></li><li><span class="hl">VESSELS PROCEEDING UNDER CONVOY</span></li><li><span class="hl">FISHING VESSELS ENGAGED IN FISHING AS A FLEET</span></li><li><span class="hl">LASH-VESSELS</span></li><li><span class="hl">FLOATING DRILL DERRICKS</span></li><li><span class="hl">FLOATING DOCKS</span>, <span class="hl">DRACONES</span>, <span class="hl">BRITISH SUBMARINES</span>, <span class="hl">AIRCRAFT-CARRIERS</span>, etc.</li></ul><p>These additional signals shall, so far as possible, be such that they <strong>cannot be mistaken</strong> for any light, shape or signal authorized elsewhere under these Rules.</p><h3>Rule 1 (d) – Traffic Separation Schemes</h3><p><span class="hl">TRAFFIC SEPARATION SCHEMES</span> may be adopted by the <span class="hl">ORGANIZATION (IMO)</span> for the purpose of these Rules.</p><h3>Rule 1 (e) – Vessels of Special Construction</h3><p>Whenever the Government concerned has determined that a <span class="hl">VESSEL OF SPECIAL CONSTRUCTION</span> or purpose cannot comply fully with the provisions regarding the number, position, range or arc of visibility of <span class="hl">LIGHTS OR SHAPES</span>, as well as the disposition and characteristics of <span class="hl">SOUND-SIGNALLING APPLIANCES</span>, such vessel shall comply with the closest possible compliance as determined by her Government.</p>`},
-  {id:"rule2",num:2,title:"Responsibility",part:"parta",notes:[],content:`<h3>Rule 2 (a)</h3><p>Nothing in these Rules shall <span class="hl">EXONERATE</span> any vessel, or the <span class="hl">OWNER, MASTER OR CREW</span> thereof, from the consequences of any <span class="hl">NEGLECT TO COMPLY</span> with these Rules or of the neglect of any precaution which may be required by the <span class="hl">ORDINARY PRACTICE OF SEAMEN</span>, or by the <span class="hl">SPECIAL CIRCUMSTANCES OF THE CASE</span>.</p><div class="nb"><strong>Meaning:</strong> There is no escaping the penalty of not following these rules. Everybody is responsible and no excuses are permitted. This rule was formulated after all the 'ordinary practice of seamen' were written down as part of these rules, but some of the 'ordinary practices' which may have been overlooked are covered by this rule.</div><div class="kp"><strong>Key Point:</strong> Circumstances can dictate a <span class="hl">DEVIATION FROM THESE RULES</span>, like if the seaman thinks that by following the rules in a special situation the action would endanger the ships, in that case, a deviation may be permitted which will not endanger the ships.</div><h3>Rule 2 (b)</h3><p>In construing and complying with these Rules <span class="hl">DUE REGARD</span> shall be had to all <span class="hl">DANGERS OF NAVIGATION AND COLLISION</span> and to any <span class="hl">SPECIAL CIRCUMSTANCES</span>, including the <span class="hl">LIMITATIONS OF THE VESSELS</span> involved, which may make a <span class="hl">DEPARTURE FROM THESE RULES</span> necessary to avoid <span class="hl">IMMEDIATE DANGER</span>.</p><div class="nb"><strong>Meaning:</strong> Pay close attention to the dangers of navigation and to the circumstances which may arise where blindly following these rules may endanger the ships. If required by common sense that to follow the rules would make a situation worse, then an action may be taken which are different from these rules but would have ensured safety for the vessels.</div>`},
-  {id:"rule3",num:3,title:"General Definitions",part:"parta",notes:[],content:`<p>For the purpose of these Rules, except where the context otherwise requires:</p><h3>(a) VESSEL</h3><p>Includes every description of water craft, including <span class="hl">NON-DISPLACEMENT CRAFT</span>, <span class="hl">WIG CRAFT</span> and <span class="hl">SEAPLANES</span>, used or capable of being used as a means of transportation on water.</p><h3>(b) POWER-DRIVEN VESSEL</h3><p>Any vessel propelled by <span class="hl">MACHINERY</span>.</p><h3>(c) SAILING VESSEL</h3><p>Any vessel under sail provided that <span class="hl">PROPELLING MACHINERY, IF FITTED, IS NOT BEING USED</span>.</p><h3>(d) VESSEL ENGAGED IN FISHING</h3><p>Any vessel fishing with <span class="hl">NETS, LINES, TRAWLS</span> or other fishing apparatus which <span class="hl">RESTRICT MANOEUVRABILITY</span>, but does <strong>not</strong> include a vessel fishing with <span class="hl">TROLLING LINES</span> or other fishing apparatus which do not restrict manoeuvrability.</p><h3>(e) SEAPLANE</h3><p>Includes any aircraft designed to manoeuvre on the water.</p><h3>(f) VESSEL NOT UNDER COMMAND</h3><p>A vessel which through some <span class="hl">EXCEPTIONAL CIRCUMSTANCE</span> is unable to manoeuvre as required by these Rules and is therefore unable to keep out of the way of another vessel.</p><h3>(g) VESSEL RESTRICTED IN HER ABILITY TO MANOEUVRE</h3><p>A vessel which from the <span class="hl">NATURE OF HER WORK</span> is restricted in her ability to manoeuvre. Includes but not limited to:</p><ul><li>(i) Vessel engaged in <span class="hl">LAYING, SERVICING OR PICKING UP</span> a navigation mark, submarine cable or pipeline</li><li>(ii) Vessel engaged in <span class="hl">DREDGING, SURVEYING OR UNDERWATER OPERATIONS</span></li><li>(iii) Vessel engaged in <span class="hl">REPLENISHMENT OR TRANSFERRING</span> persons, provisions or cargo while underway</li><li>(iv) Vessel engaged in the <span class="hl">LAUNCHING OR RECOVERY OF AIRCRAFT</span></li><li>(v) Vessel engaged in <span class="hl">MINE CLEARANCE OPERATIONS</span></li><li>(vi) Vessel engaged in a <span class="hl">TOWING OPERATION</span> such as severely restricts the towing vessel and her tow in their ability to deviate from their course</li></ul><h3>(h) VESSEL CONSTRAINED BY HER DRAUGHT</h3><p>A <span class="hl">POWER-DRIVEN VESSEL</span> which, because of her draught in relation to the <span class="hl">AVAILABLE DEPTH AND WIDTH</span> of navigable water, is severely restricted in her ability to deviate from the course she is following.</p><h3>(i) UNDERWAY</h3><p>Means that a vessel is <strong>not</strong> at <span class="hl">ANCHOR</span>, or <span class="hl">MADE FAST TO THE SHORE</span>, or <span class="hl">AGROUND</span>.</p><h3>(j) LENGTH AND BREADTH</h3><p>Mean her <span class="hl">LENGTH OVERALL</span> and <span class="hl">GREATEST BREADTH</span>.</p><h3>(k) IN SIGHT OF ONE ANOTHER</h3><p>Vessels shall be deemed to be in sight of one another only when one can be <span class="hl">OBSERVED VISUALLY</span> from the other.</p><h3>(l) RESTRICTED VISIBILITY</h3><p>Any condition in which visibility is restricted by <span class="hl">FOG, MIST, FALLING SNOW, HEAVY RAINSTORMS, SANDSTORMS</span> or any other similar causes.</p><h3>(m) WING-IN-GROUND (WIG) CRAFT</h3><p>A <span class="hl">MULTIMODAL CRAFT</span> which, in its main operational mode, flies in close proximity to the surface by utilizing <span class="hl">SURFACE-EFFECT ACTION</span>.</p>`},
-  {id:"rule4",num:4,title:"Application",part:"partb1",notes:[],content:`<p>Rules in this section apply in <span class="hl">ANY CONDITION OF VISIBILITY</span>.</p><div class="nb"><strong>VISIBILITY</strong> – the measure of the distance at which an object or light can be clearly discerned.</div><h3>Visibility Range Scale</h3><table><tr><th>Term</th><th>Meaning</th></tr><tr><td><span class="hl">GOOD</span></td><td>More than 5 nautical miles</td></tr><tr><td><span class="hl">MODERATE</span></td><td>2 to 5 nautical miles</td></tr><tr><td><span class="hl">POOR</span></td><td>1000 metres to 2 nautical miles</td></tr><tr><td><span class="hl">VERY POOR</span></td><td>Less than 1000 metres</td></tr><tr><td><span class="hl">FOG</span></td><td>Less than 1000m</td></tr><tr><td><span class="hl">THICK FOG</span></td><td>Less than 200m</td></tr><tr><td><span class="hl">DENSE FOG</span></td><td>Less than 50m</td></tr></table>`},
-  {id:"rule5",num:5,title:"Look-out",part:"partb1",notes:[],content:`<p>Every vessel shall at all times maintain a <span class="hl">PROPER LOOK-OUT</span> by <span class="hl">SIGHT AND HEARING</span> as well as by <span class="hl">ALL AVAILABLE MEANS</span> appropriate in the prevailing circumstances and conditions so as to make a <span class="hl">FULL APPRAISAL</span> of the situation and of the <span class="hl">RISK OF COLLISION</span>.</p>`},
-  {id:"rule6",num:6,title:"Safe Speed",part:"partb1",notes:[],content:`<p>All vessel shall at all times proceed at a <span class="hl">SAFE SPEED</span> so that she can take proper and effective action to <span class="hl">AVOID COLLISION</span> and be <span class="hl">STOPPED WITHIN A DISTANCE</span> appropriate to the prevailing circumstances and conditions.</p><h3>Factors to consider – By all vessels:</h3><ul><li>(i) The <span class="hl">STATE OF VISIBILITY</span></li><li>(ii) The <span class="hl">TRAFFIC DENSITY</span> including concentrations of fishing vessels or any other vessels</li><li>(iii) The <span class="hl">MANEUVERABILITY</span> of the vessel with special reference to <span class="hl">STOPPING DISTANCE</span> and <span class="hl">TURNING ABILITY</span></li><li>(iv) At night the presence of <span class="hl">BACKGROUND LIGHT</span> such as from shore lights or from back scatter of her own lights</li><li>(v) The state of <span class="hl">WIND, SEA AND CURRENT</span>, and the proximity of <span class="hl">NAVIGATIONAL HAZARDS</span></li><li>(vi) The <span class="hl">DRAUGHT</span> in relation to the available <span class="hl">DEPTH OF WATER</span></li></ul><h3>Factors to consider – Additionally, by vessels with operational radar:</h3><ul><li>(i) The <span class="hl">CHARACTERISTICS, EFFICIENCY AND LIMITATIONS</span> of the radar equipment</li><li>(ii) Any <span class="hl">CONSTRAINTS IMPOSED BY THE RADAR RANGE SCALE</span> in use</li><li>(iii) The effect on <span class="hl">RADAR DETECTION</span> on the sea state, weather and other sources of interference</li><li>(iv) The possibility that <span class="hl">SMALL VESSELS, ICE AND OTHER FLOATING OBJECTS</span> may not be detected by radar at an adequate range</li><li>(v) The <span class="hl">NUMBER, LOCATION AND MOVEMENT</span> of vessels detected by radar</li><li>(vi) The more exact <span class="hl">ASSESSMENT OF THE VISIBILITY</span> that may be possible when radar is used to determine the range of vessels or other objects in the vicinity</li></ul>`},
-  {id:"rule7",num:7,title:"Risk of Collision",part:"partb1",notes:[],content:`<p>(a) Every vessel shall use <span class="hl">ALL AVAILABLE MEANS</span> appropriate to the prevailing circumstances and conditions to determine if <span class="hl">RISK OF COLLISION</span> exists. If there is any doubt such risk shall be <span class="hl">DEEMED TO EXIST</span>.</p><p>(b) Proper use shall be made of <span class="hl">RADAR EQUIPMENT</span> if fitted and operational, including <span class="hl">LONG RANGE SCANNING</span> to obtain early warning of risk of collision and <span class="hl">RADAR PLOTTING</span> or equivalent systematic observation of detected objects.</p><p>(c) <span class="hl">ASSUMPTIONS SHALL NOT BE MADE</span> on the basis of <span class="hl">SCANTY INFORMATION</span>, especially on scanty radar information.</p><h3>(d) Determining if risk of collision exists:</h3><ul><li>(i) Such risk shall be deemed to exist if the <span class="hl">COMPASS BEARING</span> of an approaching vessel <span class="hl">DOES NOT APPRECIABLY CHANGE</span>.</li><li>(ii) Such risk may sometimes exist even when an <span class="hl">APPRECIABLE BEARING CHANGE</span> is evident, particularly when approaching a <span class="hl">VERY LARGE VESSEL</span> or a <span class="hl">TOW</span> or when approaching a vessel at <span class="hl">CLOSE RANGE</span>.</li></ul>`},
-  {id:"rule8",num:8,title:"Action to Avoid Collision",part:"partb1",notes:[],content:`<p>(a) Any action to avoid collision shall be <span class="hl">POSITIVE</span>, made in <span class="hl">AMPLE TIME</span> and with due regard to the observance of <span class="hl">GOOD SEAMANSHIP</span>.</p><p>(b) Any <span class="hl">ALTERATION OF COURSE AND/OR SPEED</span> to avoid collision shall be <span class="hl">LARGE ENOUGH TO BE READILY APPARENT</span> to another vessel observing visually or by radar. A <span class="hl">SMALL ALTERATION</span> of course and/or speed <strong>should be avoided</strong>.</p><p>(c) If there is sufficient sea room, <span class="hl">ALTERATION OF COURSE ALONE</span> may be the most effective action to avoid a <span class="hl">CLOSE QUARTER SITUATION</span> provided that it is made in good time, is substantial and does not result in another close quarter situation.</p><p>(d) Action taken shall result in <span class="hl">PASSING AT A SAFE DISTANCE</span>. The effectiveness of the action shall be carefully checked until the other vessel is <span class="hl">FINALLY PAST AND CLEAR</span>.</p><p>(e) If necessary, a vessel shall <span class="hl">SLACKEN HER SPEED</span> or take all the way off by <span class="hl">STOPPING OR REVERSING</span> her means of propulsion.</p>`},
-  {id:"rule9",num:9,title:"Narrow Channels",part:"partb1",notes:[],content:`<p>(a) A vessel proceeding along a <span class="hl">NARROW CHANNEL OR FAIRWAY</span> shall keep as near to the <span class="hl">OUTER LIMIT</span> of the channel or fairway which lies on her <span class="hl">STARBOARD SIDE</span> as is safe and practicable.</p><p>(b) A vessel of <span class="hl">LESS THAN 20M IN LENGTH</span> or a <span class="hl">SAILING VESSEL</span> shall <strong>not impede</strong> the passage of a vessel which can safely navigate only within a narrow channel or fairway.</p><p>(c) A <span class="hl">VESSEL ENGAGED IN FISHING</span> shall <strong>not impede</strong> the passage of any other vessel navigating within a narrow channel or fairway.</p><p>(d) A vessel shall <strong>not cross</strong> a narrow channel or fairway if such crossing <span class="hl">IMPEDES THE PASSAGE</span> of a vessel which can safely navigate only within such channel or fairway.</p><p>(f) A vessel nearing a <span class="hl">BEND</span> or an area of a narrow channel or fairway where other vessels may be obscured by an <span class="hl">INTERVENING OBSTRUCTION</span> shall navigate with <span class="hl">PARTICULAR ALERTNESS AND CAUTION</span> and shall sound the appropriate signal prescribed in <span class="hl">RULE 34 (e)</span>.</p><p>(g) Any vessel shall, if the circumstances of the case admit, <span class="hl">AVOID ANCHORING</span> in a narrow channel.</p>`},
-  {id:"rule10",num:10,title:"Traffic Separation Scheme (TSS)",part:"partb1",notes:[],content:`<p>(b) A vessel using a <span class="hl">TRAFFIC SEPARATION SCHEME</span> shall:</p><ul><li>i. Proceed in the <span class="hl">APPROPRIATE TRAFFIC LANE</span> in the <span class="hl">GENERAL DIRECTION OF TRAFFIC FLOW</span> for that lane.</li><li>ii. So far as practicable keep clear of a <span class="hl">TRAFFIC SEPARATION LINE</span> or <span class="hl">SEPARATION ZONE</span>.</li></ul><p>(c) A vessel shall so far as practicable <span class="hl">AVOID CROSSING TRAFFIC LANES</span>, but if obliged to do so shall cross on a heading as nearly as practicable at <span class="hl">RIGHT ANGLES</span> to the general direction of traffic flow.</p><p>(d) i. A vessel shall <strong>not</strong> use an <span class="hl">INSHORE TRAFFIC ZONE</span> when she can safely use the appropriate traffic lane within the adjacent traffic separation scheme.</p><p>(g) A vessel shall so far as practicable <span class="hl">AVOID ANCHORING</span> in a traffic separation scheme or in areas near its terminations.</p>`},
-  {id:"rule11",num:11,title:"Application",part:"partb2",notes:[],content:`<p>Rules in this section apply to vessels <span class="hl">IN SIGHT OF ONE ANOTHER</span>.</p><div class="nb">Vessels shall be deemed to be in sight of another only when one can be <span class="hl">OBSERVED VISUALLY</span> from the other.</div>`},
-  {id:"rule12",num:12,title:"Sailing Vessels",part:"partb2",notes:[],content:`<div class="nb"><span class="hl">SAILING VESSELS</span> are vessels under sail provided that propelling machinery, if fitted, is not being used.</div><p><strong>(a)</strong> When two <span class="hl">SAILING VESSELS</span> are approaching one another, so as to involve risk of collision, one of them shall keep out of the way of the other as follows:</p><ul><li><strong>(i)</strong> When each has the <span class="hl">WIND ON DIFFERENT SIDE</span>, the vessel which has the wind on the <span class="hl">PORT SIDE</span> shall <span class="hl">KEEP OUT OF THE WAY</span> of the other.</li><li><strong>(ii)</strong> When both have the <span class="hl">WIND ON THE SAME SIDE</span>, the vessel which is to <span class="hl">WINDWARD</span> shall keep out of the way of the vessel which is to <span class="hl">LEEWARD</span>.</li><li><strong>(iii)</strong> If a vessel with the wind on the <span class="hl">PORT SIDE</span> sees a vessel to <span class="hl">WINDWARD</span> and cannot determine with certainty whether the other vessel has the wind on the port or on the starboard side, she shall <span class="hl">KEEP OUT OF THE WAY</span> of the other.</li></ul><p><strong>(b)</strong> For the purposes of this rule the <span class="hl">WINDWARD SIDE</span> shall be deemed to be the side <span class="hl">OPPOSITE TO THAT ON WHICH THE MAINSAIL IS CARRIED</span> or, in the case of a <span class="hl">SQUARE-RIGGED VESSEL</span>, the side opposite to that on which the <span class="hl">LARGEST FORE AND AFT SAIL</span> is carried.</p>`},
-  {id:"rule13",num:13,title:"Overtaking",part:"partb2",notes:[],content:`<div class="nb">The <span class="hl">OVERTAKING SITUATION</span> is generally regarded as presenting the <strong>least risk</strong> to vessels involved, due to low relative speeds resulting in a more slowly developing situation.</div><p><strong>(a)</strong> Notwithstanding anything contained in Part B Section I and II, any vessel <span class="hl">OVERTAKING</span> any other shall <span class="hl">KEEP OUT OF THE WAY</span> of the vessel being overtaken.</p><p><strong>(b)</strong> A vessel shall be deemed to be overtaking when coming up with another vessel from a direction more than <span class="hl">22.5 DEGREES ABAFT HER BEAM</span>, that is, in such a position that at night she would be able to see only the <span class="hl">STERN LIGHT</span> of that vessel but neither of her <span class="hl">SIDELIGHTS</span>.</p><p><strong>(c)</strong> When a vessel is in any doubt as to whether she is overtaking another, she shall <span class="hl">ASSUME THAT THIS IS THE CASE</span> and act accordingly.</p><p><strong>(d)</strong> Any <span class="hl">SUBSEQUENT ALTERATION OF THE BEARING</span> between the two vessels shall not make the overtaking vessel a crossing vessel or relieve her of the duty of keeping clear until she is <span class="hl">FINALLY PAST AND CLEAR</span>.</p><div class="kp"><strong>Overtaking Notes:</strong> Despite the perception of low risk, overtaking situations frequently require vessels to be in <span class="hl">CLOSE PROXIMITY</span> for extended periods. The rule does not require the overtaking vessel to maneuver in any particular manner, generally allowing it to pass on <span class="hl">EITHER SIDE</span>. Care should be exercised to maintain an appropriate distance to prevent the effects of <span class="hl">INTERACTION</span>.</div>`},
-  {id:"rule14",num:14,title:"Head on Situation",part:"partb2",notes:[],content:`<p><strong>(a)</strong> When two <span class="hl">POWER-DRIVEN VESSELS</span> are meeting on a <span class="hl">RECIPROCAL OR NEARLY RECIPROCAL</span> courses so as to involve risk of collision, each shall <span class="hl">ALTER HER COURSE TO STARBOARD</span> so that each shall pass on the <span class="hl">PORT SIDE</span> of the other.</p><p><strong>(b)</strong> Such a situation shall be deemed to exist when a vessel sees the other <span class="hl">AHEAD OR NEARLY AHEAD</span> and by night she could see the <span class="hl">MASTHEAD LIGHTS</span> of the other in a line or nearly in a line and/or <span class="hl">BOTH SIDELIGHTS</span> and by day she observes the corresponding aspect of the vessel.</p><p><strong>(c)</strong> When a vessel is in any doubt as to whether such a situation exists she shall <span class="hl">ASSUME THAT IT DOES</span>.</p><div class="kp"><strong>Key Point:</strong> It is a clear instruction when the vessels are head on perfectly. When the vessels are nearly on reciprocal courses, both vessels are asked to <span class="hl">ALTER COURSE TO STARBOARD</span>. A nearly reciprocal course would deem that the vessels would be passing very close to each other, and the situation could become a <span class="hl">CLOSE QUARTER SITUATION</span>.</div>`},
-  {id:"rule15",num:15,title:"Crossing Situation",part:"partb2",notes:[],content:`<p>When two <span class="hl">POWER DRIVEN VESSELS</span> are crossing so as to involve risk of collision, the vessel which has the other on her own <span class="hl">STARBOARD SIDE</span> shall <span class="hl">KEEP OUT OF THE WAY</span> and shall, if the circumstances of the case admit, <span class="hl">AVOID CROSSING AHEAD</span> of the other vessel.</p><div class="kp"><strong>Key Point:</strong> It is always better to avoid a <span class="hl">CLOSE QUARTER SITUATION</span> and go right around the <span class="hl">STERN</span> of the other vessel rather than cross ahead. If the situation permits, this should be followed if the crossing would result in a small <span class="hl">CPA (CLOSEST POINT OF APPROACH)</span>.</div>`},
-  {id:"rule16",num:16,title:"Action by Give Way Vessel",part:"partb2",notes:[],content:`<p>Every vessel which is directed to <span class="hl">KEEP OUT OF THE WAY</span> of another vessel shall, so far as possible, take <span class="hl">EARLY AND SUBSTANTIAL ACTION</span> to keep well clear.</p><div class="kp"><strong>Key Point:</strong> <span class="hl">GIVE WAY VESSELS</span> should take action well in time, estimate the speed of approach between the two vessels, estimate the approximate time interval and then take action. Do not take <span class="hl">LATE ACTION</span>, since this would make the stand on vessel apprehensive and she may then take an action which would be detrimental to both vessels.</div>`},
-  {id:"rule17",num:17,title:"Action by Stand On Vessel",part:"partb2",notes:[],content:`<p><strong>(a)(i)</strong> Where one of two vessels is to keep out of the way, the other shall <span class="hl">KEEP HER COURSE AND SPEED</span>.</p><p><strong>(a)(ii)</strong> The latter vessel may however take action to <span class="hl">AVOID COLLISION BY HER MANEUVER ALONE</span>, as soon as it becomes apparent to her that the vessel required to keep out of the way is <strong>not taking appropriate action</strong> in compliance with these Rules.</p><p><strong>(b)</strong> When, from any cause, the vessel required to keep her course and speed finds herself so close that <span class="hl">COLLISION CANNOT BE AVOIDED</span> by the action of the give way vessel alone, she shall take action as well best to <span class="hl">AVOID COLLISION</span>.</p><p><strong>(c)</strong> A power driven vessel which takes action in a <span class="hl">CROSSING SITUATION</span> in accordance with sub paragraph (a)(ii) to avoid collision with another power-driven vessel shall, if the circumstances of the case admit, <span class="hl">NOT ALTER COURSE TO PORT</span> for a vessel on her own port side.</p><p><strong>(d)</strong> This Rule does <strong>not relieve</strong> the <span class="hl">GIVE WAY VESSEL</span> of her obligation to keep out of the way.</p><div class="kp"><strong>Stand on Vessel Notes:</strong> As long as the give way vessel takes action well in time there is no problem. The <span class="hl">STAND ON VESSEL</span> is required not to take action, but it does not mean she would not be alert and monitor the situation. The watch keeper on the stand on vessel must be alert and his <span class="hl">PLAN FOR EVASIVE ACTION</span> should be ready at all instances if the give way vessel fails to take action or if the action is not sufficient.</div>`},
-  {id:"rule18",num:18,title:"Responsibilities Between Vessels",part:"partb2",notes:[],content:`<p>Except where <span class="hl">RULES 9, 10, AND 13</span> otherwise require:</p><h3>(a) A POWER DRIVEN VESSEL underway shall keep out of the way of:</h3><ul><li>(i) A <span class="hl">VESSEL NOT UNDER COMMAND</span></li><li>(ii) A <span class="hl">VESSEL RESTRICTED IN HER ABILITY TO MANEUVER</span></li><li>(iii) A <span class="hl">VESSEL ENGAGED IN FISHING</span></li><li>(iv) A <span class="hl">SAILING VESSEL</span></li></ul><h3>(b) A SAILING VESSEL underway shall keep out of the way of:</h3><ul><li>(i) A <span class="hl">VESSEL NOT UNDER COMMAND</span></li><li>(ii) A <span class="hl">VESSEL RESTRICTED IN HER ABILITY TO MANEUVER</span></li><li>(iii) A <span class="hl">VESSEL ENGAGED IN FISHING</span></li></ul><h3>(c) A VESSEL ENGAGED IN FISHING when underway shall keep out of the way of:</h3><ul><li>(i) A <span class="hl">VESSEL NOT UNDER COMMAND</span></li><li>(ii) A <span class="hl">VESSEL RESTRICTED IN HER ABILITY TO MANEUVER</span></li></ul><h3>(d) VESSEL CONSTRAINED BY HER DRAUGHT</h3><p>(d)(i) Any vessel other than a <span class="hl">VESSEL NOT UNDER COMMAND</span> or a <span class="hl">VESSEL RESTRICTED IN HER ABILITY TO MANOEUVRE</span> shall, if the circumstances admit, avoid impeding the safe passage of a <span class="hl">VESSEL CONSTRAINED BY HER DRAUGHT</span>, exhibiting the signals in <span class="hl">RULE 28</span>.</p><p>(d)(ii) A <span class="hl">VESSEL CONSTRAINED BY HER DRAUGHT</span> shall navigate with <span class="hl">PARTICULAR CAUTION</span> having full regard to her special condition.</p><h3>(e) SEAPLANE</h3><p>A <span class="hl">SEAPLANE</span> on the water shall, in general keep well clear of all vessels and avoid impeding their navigation.</p><h3>(f) WIG CRAFT</h3><p>(f)(i) A <span class="hl">WIG CRAFT</span> shall, when taking off, landing and in flight near the surface, keep well clear of all other vessels and avoid impeding their navigation.</p><p>(f)(ii) A <span class="hl">WIG CRAFT</span> operating in the water surface shall comply with the Rules of this part as a <span class="hl">POWER-DRIVEN VESSEL</span>.</p><h3>The Give Way Hierarchy (Rule 18)</h3><div class="hierarchy"><div class="hi hi1"><span class="hr">1</span> VESSEL NOT UNDER COMMAND (NUC) – highest priority</div><div class="hi hi2"><span class="hr">2</span> VESSEL RESTRICTED IN ABILITY TO MANOEUVRE (RAM)</div><div class="hi hi3"><span class="hr">3</span> VESSEL ENGAGED IN FISHING</div><div class="hi hi4"><span class="hr">4</span> SAILING VESSEL</div><div class="hi hi5"><span class="hr">5</span> POWER-DRIVEN VESSEL</div><div class="hi hi6"><span class="hr">6</span> SEAPLANE / WIG CRAFT – keeps clear of all</div></div><div class="nb"><strong>GROUND EFFECT VEHICLE (GEV) / WING-IN-GROUND (WIG) CRAFT:</strong> A vehicle that is able to move over the surface by gaining support from the reactions of the air against the surface of the earth or water. Typically designed to glide over a level surface (usually over the sea) by making use of <span class="hl">GROUND EFFECT</span>, the aerodynamic interaction between the moving wing and the surface below.</div>`}
-];
+          useEffect(() => {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(rules));
+          }, [rules]);
 
-const SUMMARY = [
-  {r:"Rule 1",t:"Application: COLREGS apply to all vessels on the high seas and connected waters navigable by seagoing vessels."},
-  {r:"Rule 2",t:"Responsibility: No one is exonerated from complying. Departure from rules permitted only to avoid immediate danger."},
-  {r:"Rule 3",t:"General Definitions: Defines vessel, power-driven vessel, sailing vessel, NUC, RAM, constrained by draught, etc."},
-  {r:"Rule 4",t:"Applies in any condition of visibility."},
-  {r:"Rule 5",t:"Proper look-out at all times by sight, hearing, and all available means."},
-  {r:"Rule 6",t:"Safe speed considering visibility, traffic, manoeuvrability, and radar factors."},
-  {r:"Rule 7",t:"Use all available means to determine risk of collision. If in doubt, risk exists."},
-  {r:"Rule 8",t:"Action must be positive, in ample time, and large enough to be apparent."},
-  {r:"Rule 9",t:"Keep to starboard in narrow channels. Vessels <20m, sailing vessels, and fishing vessels shall not impede."},
-  {r:"Rule 10",t:"Follow TSS traffic lanes, cross at right angles, avoid anchoring in TSS."},
-  {r:"Rule 11",t:"Applies to vessels in sight of one another (visual observation)."},
-  {r:"Rule 12",t:"Sailing vessel rules: port tack gives way, windward gives way, doubt = give way."},
-  {r:"Rule 13",t:"Overtaking: overtaking vessel keeps clear (>22.5° abaft beam)."},
-  {r:"Rule 14",t:"Head on: both alter to starboard, pass port to port."},
-  {r:"Rule 15",t:"Crossing: vessel with other on starboard side gives way, avoid crossing ahead."},
-  {r:"Rule 16",t:"Give way vessel: take early and substantial action."},
-  {r:"Rule 17",t:"Stand on vessel: maintain course and speed, but may act if give way vessel fails."},
-  {r:"Rule 18",t:"Hierarchy: NUC > RAM > Fishing > Sailing > Power-driven > Seaplane/WIG."}
-];
+          const sorted = useMemo(() => [...rules].sort((a, b) => a.num - b.num), [rules]);
 
-const PART_LABELS = {
-  parta: "Part A – General",
-  partb1: "Part B Section I – Any Condition of Visibility",
-  partb2: "Part B Section II – Vessels in Sight"
-};
+          const add = useCallback((r) => {
+            setRules(p => [...p, { ...r, id: "c_" + Date.now(), notes: [] }]);
+          }, []);
 
-const STORAGE_KEY = "colregs_v3";
+          const update = useCallback((id, u) => {
+            setRules(p => p.map(r => r.id === id ? { ...r, ...u } : r));
+          }, []);
 
-/* ================================================================
-   STATE
-   ================================================================ */
-let rules = [];
-let currentFilter = "all";
-let currentSearch = "";
-let editId = null;
-let openCards = {};
-let summaryOpen = false;
+          const remove = useCallback((id) => {
+            setRules(p => p.filter(r => r.id !== id));
+          }, []);
 
-function loadRules() {
-  try {
-    const s = localStorage.getItem(STORAGE_KEY);
-    rules = s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_RULES));
-  } catch(e) {
-    rules = JSON.parse(JSON.stringify(DEFAULT_RULES));
-  }
-}
+          const addNote = useCallback((ruleId, text) => {
+            setRules(p => p.map(r => r.id === ruleId ? {
+              ...r, notes: [...r.notes, { id: "n_" + Date.now(), text, time: new Date().toLocaleString() }]
+            } : r));
+          }, []);
 
-function saveRules() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(rules));
-}
+          const updateNote = useCallback((ruleId, noteId, text) => {
+            setRules(p => p.map(r => r.id === ruleId ? {
+              ...r, notes: r.notes.map(n => n.id === noteId ? { ...n, text, time: new Date().toLocaleString() + " (edited)" } : n)
+            } : r));
+          }, []);
 
-function sortedRules() {
-  return [...rules].sort((a,b) => a.num - b.num);
-}
+          const removeNote = useCallback((ruleId, noteId) => {
+            setRules(p => p.map(r => r.id === ruleId ? {
+              ...r, notes: r.notes.filter(n => n.id !== noteId)
+            } : r));
+          }, []);
 
-/* ================================================================
-   TOAST
-   ================================================================ */
-let toastTimer;
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.remove('hidden');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.add('hidden'), 2500);
-}
+          const reset = useCallback(() => {
+            setRules(structuredClone(DEFAULT_RULES));
+          }, []);
 
-/* ================================================================
-   RENDER
-   ================================================================ */
-function render() {
-  const sorted = sortedRules();
-  let filtered = sorted;
-  if (currentFilter !== "all") filtered = filtered.filter(r => r.part === currentFilter);
-  if (currentSearch.trim()) {
-    const q = currentSearch.toLowerCase();
-    filtered = filtered.filter(r => {
-      const s = ("rule " + r.num + " " + r.title + " " + r.content + " " + r.notes.map(n=>n.text).join(" ")).toLowerCase();
-      return s.includes(q);
-    });
-  }
+          return { rules: sorted, add, update, remove, addNote, updateNote, removeNote, reset };
+        }
 
-  // Group by part
-  const groups = new Map();
-  for (const r of filtered) {
-    if (!groups.has(r.part)) groups.set(r.part, []);
-    groups.get(r.part).push(r);
-  }
+        function getRuleLabel(num) {
+          if (num >= 400) return "Annex IV";
+          if (num >= 300) return "Annex III";
+          if (num >= 200) return "Annex II";
+          if (num >= 100) return "Annex I";
+          return `Rule ${num}`;
+        }
 
-  // Jump nav
-  renderJumpNav(sorted);
+        /* ================================================================
+           COMPONENTS
+           ================================================================ */
 
-  // Main content
-  const main = document.getElementById('mainContent');
-  let html = '';
+        function Toast({ msg }) {
+          if (!msg) return null;
+          return (
+            <div className="fixed bottom-5 right-5 z-[999] bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-xl animate-in">
+              {msg}
+            </div>
+          );
+        }
 
-  for (const [part, partRules] of groups) {
-    html += `<div class="part-header ${part}">${PART_LABELS[part] || PART_LABELS.parta}</div>`;
-    for (const r of partRules) {
-      const isOpen = openCards[r.id] || false;
-      const partCls = r.part;
-      html += `<div class="rule-card" id="rule-${r.num}">`;
-      html += `<div class="rule-header" onclick="toggleCard('${r.id}')">`;
-      html += `<div class="rule-num ${partCls}">${r.num}</div>`;
-      html += `<div class="rule-info"><div class="rule-title">Rule ${r.num} – ${escHtml(r.title)}</div><div class="rule-part">${PART_LABELS[r.part] || ''}</div></div>`;
-      html += `<div class="rule-actions">`;
-      if (r.notes.length > 0) html += `<span class="note-badge">📝 ${r.notes.length}</span>`;
-      html += `<button class="btn-icon edit" onclick="event.stopPropagation();openEdit('${r.id}')" title="Edit">✎</button>`;
-      html += `<button class="btn-icon del" onclick="event.stopPropagation();handleDelete('${r.id}')" title="Delete">✕</button>`;
-      html += `<span class="chevron${isOpen?' open':''}">▾</span>`;
-      html += `</div></div>`;
+        function Modal({ open, onClose, title, children }) {
+          const ref = useRef(null);
+          useEffect(() => { document.body.style.overflow = open ? "hidden" : ""; return () => { document.body.style.overflow = ""; }; }, [open]);
+          if (!open) return null;
+          return (
+            <div ref={ref} className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4" onClick={e => { if (e.target === ref.current) onClose(); }}>
+              <div className="bg-slate-800 border border-slate-600 rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
+                  <h3 className="text-lg font-bold text-sky-400">{title}</h3>
+                  <button onClick={onClose} className="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+                </div>
+                <div className="p-6">{children}</div>
+              </div>
+            </div>
+          );
+        }
 
-      html += `<div class="rule-body${isOpen?'':' hidden'}">`;
-      html += `<div class="rule-content">${r.content}</div>`;
+        function RuleCard({ rule, onEdit, onDelete, onAddNote, onEditNote, onDeleteNote }) {
+          const [open, setOpen] = useState(false);
+          const [noteText, setNoteText] = useState("");
+          const pi = partOf(rule.part);
+          const label = getRuleLabel(rule.num);
 
-      // Notes
-      html += `<div class="notes-section">`;
-      html += `<div class="notes-title">📝 Study Notes (${r.notes.length})</div>`;
-      for (const n of r.notes) {
-        html += `<div class="note-item">`;
-        html += `<p class="note-text">${escHtml(n.text)}</p>`;
-        html += `<span class="note-time">${escHtml(n.time)}</span>`;
-        html += `<div class="note-actions">`;
-        html += `<button onclick="handleEditNote('${r.id}','${n.id}')">✎</button>`;
-        html += `<button class="del-note" onclick="handleDeleteNote('${r.id}','${n.id}')">✕</button>`;
-        html += `</div></div>`;
-      }
-      html += `<div class="add-note-row">`;
-      html += `<textarea class="note-input" id="note-input-${r.id}" placeholder="Add a study note..." rows="1"></textarea>`;
-      html += `<button class="btn-note-add" onclick="handleAddNote('${r.id}')">Add</button>`;
-      html += `</div></div>`;
+          return (
+            <div id={`rule-${rule.num}`} className="bg-slate-800/80 border border-slate-700/60 rounded-xl overflow-hidden hover:border-sky-500/30 transition-all duration-200 hover:shadow-lg hover:shadow-sky-500/5">
+              <div className="flex items-center gap-3 px-4 py-3 cursor-pointer select-none" onClick={() => setOpen(!open)}>
+                <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${pi.numGrad} flex items-center justify-center text-white font-extrabold text-[10px] shrink-0 leading-tight text-center`}>
+                  {rule.num < 100 ? rule.num : (rule.num >= 400 ? "AIV" : rule.num >= 300 ? "AIII" : rule.num >= 200 ? "AII" : "AI")}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-base font-semibold text-slate-100 truncate">{label} – {rule.title}</h2>
+                  <p className="text-[11px] text-slate-500 uppercase tracking-wider truncate">{pi.label}</p>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {rule.notes.length > 0 && (
+                    <span className="text-[11px] bg-emerald-500/15 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/25">
+                      {rule.notes.length} note{rule.notes.length > 1 ? "s" : ""}
+                    </span>
+                  )}
+                  <button onClick={e => { e.stopPropagation(); onEdit(); }} className="p-1.5 text-slate-500 hover:text-orange-400 hover:bg-orange-500/10 rounded-lg transition-colors" title="Edit">✎</button>
+                  <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors" title="Delete">✕</button>
+                  <span className={`text-slate-500 text-lg transition-transform duration-200 ${open ? "rotate-180" : ""}`}>▾</span>
+                </div>
+              </div>
 
-      html += `</div></div>`;
-    }
-  }
+              {open && (
+                <div className="border-t border-slate-700/50 px-5 pb-5">
+                  <div className="rule-content mt-4 text-sm leading-relaxed text-slate-300" dangerouslySetInnerHTML={{ __html: rule.content }} />
+                  <div className="mt-5 pt-4 border-t border-slate-700/40">
+                    <h4 className="text-emerald-400 text-sm font-semibold mb-3 flex items-center gap-2">📝 Study Notes ({rule.notes.length})</h4>
+                    {rule.notes.map(n => (
+                      <div key={n.id} className="bg-slate-900/60 rounded-lg p-3 mb-2 flex items-start gap-3 group">
+                        <p className="flex-1 text-sm text-slate-400 whitespace-pre-wrap">{n.text}</p>
+                        <span className="text-[10px] text-slate-600 shrink-0">{n.time}</span>
+                        <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => onEditNote(n.id)} className="text-slate-500 hover:text-sky-400 text-xs p-1 rounded" title="Edit note">✎</button>
+                          <button onClick={() => onDeleteNote(n.id)} className="text-slate-500 hover:text-red-400 text-xs p-1 rounded" title="Delete note">✕</button>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="flex gap-2 mt-2">
+                      <textarea
+                        value={noteText}
+                        onChange={e => setNoteText(e.target.value)}
+                        placeholder="Add a study note..."
+                        rows={1}
+                        className="flex-1 bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300 placeholder-slate-600 focus:outline-none focus:border-sky-500 resize-y"
+                      />
+                      <button
+                        onClick={() => { if (noteText.trim()) { onAddNote(noteText.trim()); setNoteText(""); } }}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 rounded-lg transition-colors"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }
 
-  if (filtered.length === 0) {
-    html += `<div class="empty"><div class="icon">🔍</div><p>No rules found. Try adjusting your search or filter.</p></div>`;
-  }
+        /* ================================================================
+           MAIN APP
+           ================================================================ */
+        function App() {
+          const { rules, add, update, remove, addNote, updateNote, removeNote, reset } = useRules();
+          const [filter, setFilter] = useState("all");
+          const [search, setSearch] = useState("");
+          const [toast, setToast] = useState("");
+          const [showModal, setShowModal] = useState(false);
+          const [editId, setEditId] = useState(null);
+          const [formNum, setFormNum] = useState("");
+          const [formTitle, setFormTitle] = useState("");
+          const [formPart, setFormPart] = useState("parta");
+          const [formContent, setFormContent] = useState("");
+          const [summaryOpen, setSummaryOpen] = useState(false);
+          const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Summary
-  html += `<div class="summary-card">`;
-  html += `<button class="summary-toggle" onclick="toggleSummary()"><span class="chevron${summaryOpen?' open':''}">▾</span><h3>📋 Summary &amp; Quick Reference</h3></button>`;
-  html += `<div class="summary-body${summaryOpen?'':' hidden'}">`;
-  for (const s of SUMMARY) {
-    html += `<div class="summary-item"><strong>${escHtml(s.r)}</strong> – ${escHtml(s.t)}</div>`;
-  }
-  html += `<div class="summary-footer"><p>Convention on the International Regulations for Preventing Collisions at Sea, 1972 (COLREGs)</p><p style="margin-top:.25rem"><a href="https://www.drishtiias.com/daily-updates/daily-news-analysis/unclos-maritime-zones" target="_blank" rel="noopener noreferrer">UNCLOS Maritime Zones Reference</a></p></div>`;
-  html += `</div></div>`;
+          const showToast = (m) => { setToast(m); setTimeout(() => setToast(""), 2500); };
 
-  main.innerHTML = html;
-}
+          const filtered = useMemo(() => {
+            let f = rules;
+            if (filter !== "all") f = f.filter(r => r.part === filter);
+            if (search.trim()) {
+              const q = search.toLowerCase();
+              f = f.filter(r => {
+                const s = `rule ${r.num} ${r.title} ${r.content} ${r.notes.map(n => n.text).join(" ")}`.toLowerCase();
+                return s.includes(q);
+              });
+            }
+            return f;
+          }, [rules, filter, search]);
 
-function renderJumpNav(sorted) {
-  const inner = document.querySelector('.jump-inner');
-  let html = '<span class="jump-label">Jump to Rule:</span>';
-  for (const r of sorted) {
-    const cls = r.part === 'parta' ? 'pa' : r.part === 'partb1' ? 'pb1' : 'pb2';
-    html += `<a href="#rule-${r.num}" class="jump-link ${cls}">${r.num}</a>`;
-  }
-  inner.innerHTML = html;
-}
+          const groups = useMemo(() => {
+            const m = new Map();
+            const order = ["parta", "partb1", "partb2", "partb3", "partc", "partd", "parte", "partf", "annex1", "annex2", "annex3", "annex4"];
+            for (const key of order) m.set(key, []);
+            for (const r of filtered) {
+              if (!m.has(r.part)) m.set(r.part, []);
+              m.get(r.part).push(r);
+            }
+            return Array.from(m.entries()).filter(([, v]) => v.length > 0);
+          }, [filtered]);
 
-function escHtml(s) {
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
+          function openAdd() {
+            setEditId(null); setFormNum(""); setFormTitle(""); setFormPart("parta"); setFormContent("");
+            setShowModal(true);
+          }
+          function openEdit(r) {
+            setEditId(r.id); setFormNum(String(r.num)); setFormTitle(r.title); setFormPart(r.part); setFormContent(r.content);
+            setShowModal(true);
+          }
+          function save() {
+            const n = parseInt(formNum);
+            if (!n || !formTitle.trim()) return;
+            if (editId) {
+              update(editId, { num: n, title: formTitle.trim(), part: formPart, content: formContent });
+              showToast(`${getRuleLabel(n)} updated`);
+            } else {
+              add({ num: n, title: formTitle.trim(), part: formPart, content: formContent });
+              showToast(`${getRuleLabel(n)} added`);
+            }
+            setShowModal(false);
+          }
+          function handleDelete(r) {
+            if (confirm(`Delete ${getRuleLabel(r.num)} – ${r.title}?`)) { remove(r.id); showToast(`${getRuleLabel(r.num)} deleted`); }
+          }
+          function handleEditNote(ruleId, noteId) {
+            const rule = rules.find(r => r.id === ruleId);
+            const note = rule?.notes.find(n => n.id === noteId);
+            if (!note) return;
+            const t = prompt("Edit note:", note.text);
+            if (t === null) return;
+            if (!t.trim()) { removeNote(ruleId, noteId); showToast("Note deleted"); return; }
+            updateNote(ruleId, noteId, t.trim());
+            showToast("Note updated");
+          }
+          function handleDeleteNote(ruleId, noteId) {
+            if (confirm("Delete this note?")) { removeNote(ruleId, noteId); showToast("Note deleted"); }
+          }
+          function handleReset() {
+            if (confirm("Reset all rules and notes to defaults? This will erase all your changes.")) { reset(); showToast("Data reset to defaults"); }
+          }
 
-/* ================================================================
-   ACTIONS
-   ================================================================ */
-function toggleCard(id) {
-  openCards[id] = !openCards[id];
-  render();
-}
+          const filterTabs = [
+            { key: "all", label: "All", shortLabel: "All" },
+            { key: "parta", label: "Part A", shortLabel: "A" },
+            { key: "partb1", label: "B-I", shortLabel: "B-I" },
+            { key: "partb2", label: "B-II", shortLabel: "B-II" },
+            { key: "partb3", label: "B-III", shortLabel: "B-III" },
+            { key: "partc", label: "Part C", shortLabel: "C" },
+            { key: "partd", label: "Part D", shortLabel: "D" },
+            { key: "parte", label: "Part E", shortLabel: "E" },
+            { key: "partf", label: "Part F", shortLabel: "F" },
+            { key: "annex1", label: "Annex I", shortLabel: "AI" },
+            { key: "annex2", label: "Annex II", shortLabel: "AII" },
+            { key: "annex3", label: "Annex III", shortLabel: "AIII" },
+            { key: "annex4", label: "Annex IV", shortLabel: "AIV" },
+          ];
 
-function toggleSummary() {
-  summaryOpen = !summaryOpen;
-  render();
-}
+          const sidebarSections = [
+            { title: "Part A – General", part: "parta", rules: rules.filter(r => r.part === "parta") },
+            { title: "Part B-I – Any Visibility", part: "partb1", rules: rules.filter(r => r.part === "partb1") },
+            { title: "Part B-II – In Sight", part: "partb2", rules: rules.filter(r => r.part === "partb2") },
+            { title: "Part B-III – Restricted Vis.", part: "partb3", rules: rules.filter(r => r.part === "partb3") },
+            { title: "Part C – Lights & Shapes", part: "partc", rules: rules.filter(r => r.part === "partc") },
+            { title: "Part D – Sound Signals", part: "partd", rules: rules.filter(r => r.part === "partd") },
+            { title: "Part E – Exemptions", part: "parte", rules: rules.filter(r => r.part === "parte") },
+            { title: "Part F – Verification", part: "partf", rules: rules.filter(r => r.part === "partf") },
+            { title: "Annex I", part: "annex1", rules: rules.filter(r => r.part === "annex1") },
+            { title: "Annex II", part: "annex2", rules: rules.filter(r => r.part === "annex2") },
+            { title: "Annex III", part: "annex3", rules: rules.filter(r => r.part === "annex3") },
+            { title: "Annex IV", part: "annex4", rules: rules.filter(r => r.part === "annex4") },
+          ];
 
-function handleDelete(id) {
-  const r = rules.find(x => x.id === id);
-  if (!r) return;
-  if (confirm("Delete Rule " + r.num + " – " + r.title + "?")) {
-    rules = rules.filter(x => x.id !== id);
-    saveRules();
-    showToast("Rule " + r.num + " deleted");
-    render();
-  }
-}
+          return (
+            <div className="min-h-screen bg-[#0a0e1a] text-slate-200">
+              {/* Header */}
+              <header className="bg-gradient-to-r from-[#0c1929] via-[#1a2744] to-[#0f2035] border-b-2 border-sky-700 sticky top-0 z-50 shadow-xl">
+                <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+                  <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden text-sky-400 text-2xl shrink-0">☰</button>
+                  <div className="text-center flex-1">
+                    <h1 className="text-lg md:text-xl font-bold text-sky-400 tracking-wide">⚓ COLREGS 1972</h1>
+                    <p className="text-[10px] md:text-xs text-slate-400">International Regulations for Preventing Collisions at Sea — Complete Study Notes</p>
+                    <p className="text-[10px] text-slate-500 hidden md:block">BSc Marine Transportation | Parts A–F + Annexes I–IV | Rules 1–41</p>
+                  </div>
+                </div>
+              </header>
 
-function handleAddNote(ruleId) {
-  const input = document.getElementById('note-input-' + ruleId);
-  if (!input) return;
-  const text = input.value.trim();
-  if (!text) return;
-  const r = rules.find(x => x.id === ruleId);
-  if (!r) return;
-  r.notes.push({id:"n_"+Date.now(), text:text, time:new Date().toLocaleString()});
-  saveRules();
-  showToast("Note added");
-  render();
-}
+              <div className="max-w-7xl mx-auto flex">
+                {/* Sidebar */}
+                <aside className={`fixed lg:sticky top-0 lg:top-[60px] left-0 h-full lg:h-[calc(100vh-60px)] w-64 bg-slate-900 border-r border-slate-800 overflow-y-auto z-[100] transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 shrink-0`}>
+                  <div className="p-3 pt-16 lg:pt-3">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Navigation</h3>
+                      <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-500 hover:text-white">✕</button>
+                    </div>
+                    {sidebarSections.map(sec => (
+                      <div key={sec.part} className="mb-3">
+                        <button
+                          onClick={() => { setFilter(sec.part); setSidebarOpen(false); }}
+                          className={`w-full text-left text-[11px] font-bold uppercase tracking-wider px-2 py-1.5 rounded transition-colors ${filter === sec.part ? partOf(sec.part).textCol + " bg-slate-800" : "text-slate-500 hover:text-slate-300"}`}
+                        >
+                          {sec.title} ({sec.rules.length})
+                        </button>
+                        <div className="ml-2 mt-1 space-y-0.5">
+                          {sec.rules.map(r => (
+                            <a
+                              key={r.id}
+                              href={`#rule-${r.num}`}
+                              onClick={() => setSidebarOpen(false)}
+                              className="block text-[11px] text-slate-500 hover:text-sky-400 truncate py-0.5 px-2 rounded hover:bg-slate-800/50 transition-colors"
+                            >
+                              {getRuleLabel(r.num)} – {r.title}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                    <div className="border-t border-slate-800 mt-4 pt-3 space-y-2">
+                      <button
+                        onClick={() => { setFilter("all"); setSidebarOpen(false); }}
+                        className={`w-full text-left text-xs font-bold px-2 py-1.5 rounded transition-colors ${filter === "all" ? "text-sky-400 bg-slate-800" : "text-slate-500 hover:text-sky-300"}`}
+                      >
+                        📋 Show All Rules
+                      </button>
+                      <button onClick={openAdd} className="w-full text-left text-xs text-emerald-500 hover:text-emerald-400 font-bold px-2 py-1.5 rounded hover:bg-slate-800/50 transition-colors">
+                        ＋ Add New Rule
+                      </button>
+                      <button onClick={handleReset} className="w-full text-left text-xs text-slate-600 hover:text-red-400 px-2 py-1.5 rounded hover:bg-slate-800/50 transition-colors">
+                        ↺ Reset to Defaults
+                      </button>
+                    </div>
+                  </div>
+                </aside>
+                {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-[99] lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
-function handleEditNote(ruleId, noteId) {
-  const r = rules.find(x => x.id === ruleId);
-  if (!r) return;
-  const n = r.notes.find(x => x.id === noteId);
-  if (!n) return;
-  const t = prompt("Edit note:", n.text);
-  if (t === null) return;
-  if (!t.trim()) {
-    r.notes = r.notes.filter(x => x.id !== noteId);
-    saveRules(); showToast("Note deleted"); render(); return;
-  }
-  n.text = t.trim();
-  n.time = new Date().toLocaleString() + " (edited)";
-  saveRules(); showToast("Note updated"); render();
-}
+                {/* Main content */}
+                <main className="flex-1 min-w-0">
+                  {/* Toolbar */}
+                  <div className="bg-slate-900/80 border-b border-slate-800 sticky top-[52px] z-40 backdrop-blur-sm">
+                    <div className="px-4 py-2.5 flex flex-wrap gap-1.5 items-center">
+                      <input
+                        type="text"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder="🔍 Search rules, content, notes..."
+                        className="flex-1 min-w-[140px] bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                      />
+                      <div className="flex flex-wrap gap-1">
+                        {filterTabs.map(t => (
+                          <button
+                            key={t.key}
+                            onClick={() => setFilter(t.key)}
+                            className={`px-2 py-1 rounded-lg text-[10px] font-medium border transition-colors ${filter === t.key ? "bg-sky-700 border-sky-600 text-white" : "bg-transparent border-slate-700 text-slate-400 hover:border-sky-500 hover:text-sky-300"}`}
+                          >
+                            {t.shortLabel}
+                          </button>
+                        ))}
+                      </div>
+                      <button onClick={openAdd} className="bg-sky-700 hover:bg-sky-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg transition-colors">＋ Add</button>
+                    </div>
+                  </div>
 
-function handleDeleteNote(ruleId, noteId) {
-  if (!confirm("Delete this note?")) return;
-  const r = rules.find(x => x.id === ruleId);
-  if (!r) return;
-  r.notes = r.notes.filter(x => x.id !== noteId);
-  saveRules(); showToast("Note deleted"); render();
-}
+                  {/* Course info banner */}
+                  {filter === "all" && !search && (
+                    <div className="mx-4 mt-4 bg-gradient-to-r from-sky-900/30 to-indigo-900/30 border border-sky-700/30 rounded-xl px-5 py-4">
+                      <p className="text-sky-400 font-bold text-sm">📚 Course Outcome CO1</p>
+                      <p className="text-slate-400 text-xs mt-1">Demonstrate thorough knowledge and understanding of the content, application and intent of the International Regulations for Preventing Collisions at Sea, 1972, as amended.</p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <span className="text-[10px] bg-indigo-500/15 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/25">Part A: Rules 1–3</span>
+                        <span className="text-[10px] bg-cyan-500/15 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/25">Part B-I: Rules 4–10</span>
+                        <span className="text-[10px] bg-emerald-500/15 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/25">Part B-II: Rules 11–18</span>
+                        <span className="text-[10px] bg-violet-500/15 text-violet-300 px-2 py-0.5 rounded-full border border-violet-500/25">Part B-III: Rule 19</span>
+                        <span className="text-[10px] bg-amber-500/15 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/25">Part C: Rules 20–31</span>
+                        <span className="text-[10px] bg-rose-500/15 text-rose-300 px-2 py-0.5 rounded-full border border-rose-500/25">Part D: Rules 32–37</span>
+                        <span className="text-[10px] bg-sky-500/15 text-sky-300 px-2 py-0.5 rounded-full border border-sky-500/25">Part E: Rule 38</span>
+                        <span className="text-[10px] bg-teal-500/15 text-teal-300 px-2 py-0.5 rounded-full border border-teal-500/25">Part F: Rules 39–41</span>
+                        <span className="text-[10px] bg-orange-500/15 text-orange-300 px-2 py-0.5 rounded-full border border-orange-500/25">Annexes I–IV</span>
+                      </div>
+                    </div>
+                  )}
 
-/* ================================================================
-   MODAL
-   ================================================================ */
-function openModal() {
-  document.getElementById('modalOverlay').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
+                  {/* Rules */}
+                  <div className="px-4 py-4 space-y-3">
+                    {groups.map(([part, partRules]) => {
+                      const pi = partOf(part);
+                      return (
+                        <div key={part}>
+                          <div className={`px-5 py-2.5 my-4 rounded-xl text-center text-xs font-bold uppercase tracking-wider border ${pi.borderCol} ${pi.bgCol} ${pi.textCol}`}>
+                            {pi.label}
+                          </div>
+                          <div className="space-y-2">
+                            {partRules.map(r => (
+                              <RuleCard
+                                key={r.id}
+                                rule={r}
+                                onEdit={() => openEdit(r)}
+                                onDelete={() => handleDelete(r)}
+                                onAddNote={text => { addNote(r.id, text); showToast("Note added"); }}
+                                onEditNote={noteId => handleEditNote(r.id, noteId)}
+                                onDeleteNote={noteId => handleDeleteNote(r.id, noteId)}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
 
-function closeModal() {
-  document.getElementById('modalOverlay').classList.add('hidden');
-  document.body.style.overflow = '';
-}
+                    {filtered.length === 0 && (
+                      <div className="text-center py-16">
+                        <p className="text-4xl mb-3">🔍</p>
+                        <p className="text-slate-500">No rules found. Try adjusting your search or filter.</p>
+                      </div>
+                    )}
 
-function openAdd() {
-  editId = null;
-  document.getElementById('modalTitle').textContent = 'Add New Rule';
-  document.getElementById('btnSave').textContent = 'Add Rule';
-  document.getElementById('formNum').value = '';
-  document.getElementById('formTitle').value = '';
-  document.getElementById('formPart').value = 'parta';
-  document.getElementById('formContent').value = '';
-  openModal();
-}
+                    {/* Summary */}
+                    <div className="mt-8 bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
+                      <button onClick={() => setSummaryOpen(!summaryOpen)} className="w-full flex items-center gap-3 px-5 py-4 text-left select-none">
+                        <span className={`text-slate-500 transition-transform duration-200 ${summaryOpen ? "rotate-180" : ""}`}>▾</span>
+                        <h3 className="text-lg font-semibold text-amber-400">📋 Complete Summary & Quick Reference</h3>
+                      </button>
+                      {summaryOpen && (
+                        <div className="px-5 pb-5 border-t border-slate-700/40 pt-4 space-y-4">
+                          {SUMMARY_DATA.map(sec => (
+                            <div key={sec.section}>
+                              <h4 className="text-sm font-bold text-sky-400 mb-2 border-b border-slate-700/40 pb-1">{sec.section}</h4>
+                              <div className="space-y-1">
+                                {sec.items.map(s => (
+                                  <div key={s.r} className="text-sm text-slate-400 border-b border-slate-700/20 pb-1">
+                                    <span className="font-bold text-sky-400">{s.r}</span> – {s.t}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                          <div className="mt-4 text-xs text-slate-600 border-t border-slate-700/40 pt-3">
+                            <p>Convention on the International Regulations for Preventing Collisions at Sea, 1972 (COLREGs) — as amended</p>
+                            <p className="mt-1">Total: {rules.length} rules/sections | Data saved in browser localStorage</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-function openEdit(id) {
-  const r = rules.find(x => x.id === id);
-  if (!r) return;
-  editId = id;
-  document.getElementById('modalTitle').textContent = 'Edit Rule';
-  document.getElementById('btnSave').textContent = 'Save Changes';
-  document.getElementById('formNum').value = r.num;
-  document.getElementById('formTitle').value = r.title;
-  document.getElementById('formPart').value = r.part;
-  document.getElementById('formContent').value = r.content;
-  openModal();
-}
+                  {/* Footer */}
+                  <footer className="text-center py-8 px-4 text-xs text-slate-600 border-t border-slate-800 mt-6">
+                    <p>⚓ Convention on the International Regulations for Preventing Collisions at Sea, 1972 (COLREGs) – as amended</p>
+                    <p className="mt-1">BSc Marine Transportation — Collision Regulations Study Notes — Parts A–F + Annexes I–IV</p>
+                    <p className="mt-2 text-slate-700">All data is saved automatically in your browser's local storage.</p>
+                  </footer>
+                </main>
+              </div>
 
-function saveForm() {
-  const num = parseInt(document.getElementById('formNum').value);
-  const title = document.getElementById('formTitle').value.trim();
-  const part = document.getElementById('formPart').value;
-  const content = document.getElementById('formContent').value;
-  if (!num || !title) return;
+              {/* Add/Edit Modal */}
+              <Modal open={showModal} onClose={() => setShowModal(false)} title={editId ? "Edit Rule" : "Add New Rule"}>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">Rule Number</label>
+                      <input type="number" value={formNum} onChange={e => setFormNum(e.target.value)} min={1} max={999} placeholder="e.g. 19"
+                        className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" />
+                      <p className="text-[9px] text-slate-600 mt-1">Rules: 1–41 | Annex I: 100 | II: 200 | III: 300 | IV: 400</p>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">Part / Section</label>
+                      <select value={formPart} onChange={e => setFormPart(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                        {Object.entries(PARTS).map(([k, v]) => (
+                          <option key={k} value={k}>{v.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">Title</label>
+                    <input type="text" value={formTitle} onChange={e => setFormTitle(e.target.value)} placeholder="e.g. Conduct in Restricted Visibility"
+                      className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">Content (HTML supported)</label>
+                    <textarea value={formContent} onChange={e => setFormContent(e.target.value)} rows={8} placeholder="Enter rule content..."
+                      className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500 resize-y font-mono" />
+                    <p className="text-[9px] text-slate-600 mt-1">
+                      Use &lt;span class=&quot;hl&quot;&gt;TEXT&lt;/span&gt; for highlights, &lt;div class=&quot;nb&quot;&gt; for notes, &lt;div class=&quot;kp&quot;&gt; for key points.
+                    </p>
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <button onClick={() => setShowModal(false)} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium py-2.5 rounded-lg transition-colors">Cancel</button>
+                    <button onClick={save} disabled={!formNum || !formTitle.trim()} className="flex-1 bg-sky-600 hover:bg-sky-500 disabled:opacity-40 text-white text-sm font-medium py-2.5 rounded-lg transition-colors">
+                      {editId ? "Save Changes" : "Add Rule"}
+                    </button>
+                  </div>
+                </div>
+              </Modal>
 
-  if (editId) {
-    const r = rules.find(x => x.id === editId);
-    if (r) { r.num = num; r.title = title; r.part = part; r.content = content; }
-    showToast("Rule " + num + " updated");
-  } else {
-    rules.push({id:"c_"+Date.now(), num:num, title:title, part:part, content:content, notes:[]});
-    showToast("Rule " + num + " added");
-  }
-  saveRules();
-  closeModal();
-  render();
-}
+              <Toast msg={toast} />
+            </div>
+          );
+        }
 
-function handleReset() {
-  if (confirm("Reset all rules and notes to defaults? This will erase all your changes.")) {
-    rules = JSON.parse(JSON.stringify(DEFAULT_RULES));
-    openCards = {};
-    saveRules();
-    showToast("Data reset to defaults");
-    render();
-  }
-}
-
-/* ================================================================
-   EVENT LISTENERS
-   ================================================================ */
-document.getElementById('searchInput').addEventListener('input', function(e) {
-  currentSearch = e.target.value;
-  render();
-});
-
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-    currentFilter = this.dataset.filter;
-    render();
-  });
-});
-
-document.getElementById('btnAdd').addEventListener('click', openAdd);
-document.getElementById('btnReset').addEventListener('click', handleReset);
-document.getElementById('modalClose').addEventListener('click', closeModal);
-document.getElementById('btnCancel').addEventListener('click', closeModal);
-document.getElementById('btnSave').addEventListener('click', saveForm);
-
-document.getElementById('modalOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
-/* ================================================================
-   INIT
-   ================================================================ */
-loadRules();
-render();
-</script>
+        /* ================================================================
+           RENDER
+           ================================================================ */
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
